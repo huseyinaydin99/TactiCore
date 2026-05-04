@@ -1,0 +1,626 @@
+/* ============================================================
+   TactiCore — Global Design System
+   ============================================================ */
+
+/* ── 1. CSS Variables ───────────────────────────────────────── */
+:root {
+    --bg-dark:      #080d18;
+    --bg-card:      #111827;
+    --bg-card-hover:#151f30;
+    --bg-nav:       #0b1120;
+    --green:        #00e676;
+    --green-dim:    #00c853;
+    --blue:         #2979ff;
+    --red:          #ff1744;
+    --gold:         #ffd600;
+    --text-primary: #e8eaed;
+    --text-muted:   #9aa0a6;
+    --border:       rgba(255,255,255,.08);
+    --radius-sm:    6px;
+    --radius-md:    10px;
+    --radius-lg:    14px;
+    --transition:   .18s ease;
+    --shadow-card:  0 2px 16px rgba(0,0,0,.45);
+}
+
+/* ── 2. Reset & Base ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a { color: inherit; text-decoration: none; }
+
+img { max-width: 100%; }
+
+/* ── 3. Custom Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar              { width: 6px; height: 6px; }
+::-webkit-scrollbar-track        { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb        { background: #2a3447; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover  { background: #3a4a60; }
+
+/* ── 4. Typography ──────────────────────────────────────────── */
+h1, h2, h3, h4, h5 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ── 5. Navbar ──────────────────────────────────────────────── */
+.tc-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--bg-nav);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow var(--transition);
+}
+
+.tc-navbar.scrolled {
+    box-shadow: 0 4px 24px rgba(0,0,0,.55);
+}
+
+.tc-navbar__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.tc-navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+.tc-navbar__brand i { font-size: 1.5rem; }
+
+.tc-navbar__nav {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-left: auto;
+}
+
+.tc-navbar__link {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .85rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: .9rem;
+    font-weight: 500;
+    transition: color var(--transition), background var(--transition);
+}
+
+.tc-navbar__link:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,.06);
+}
+
+.tc-navbar__toggler {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    padding: .2rem .45rem;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+/* ── 6. Main content ────────────────────────────────────────── */
+.tc-main { flex: 1; padding: 2rem 0; }
+
+.tc-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+/* ── 7. Cards ───────────────────────────────────────────────── */
+.tc-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-card);
+    transition: background var(--transition), transform var(--transition);
+}
+
+.tc-card:hover {
+    background: var(--bg-card-hover);
+}
+
+/* ── 8. Stat Cards ──────────────────────────────────────────── */
+.stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: transform var(--transition);
+}
+
+.stat-card:hover { transform: translateY(-2px); }
+
+.stat-card__number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-card__label {
+    font-size: .8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-top: .35rem;
+}
+
+.stat-card--live   .stat-card__number { color: var(--red); }
+.stat-card--done   .stat-card__number { color: var(--green); }
+.stat-card--next   .stat-card__number { color: var(--blue); }
+.stat-card--total  .stat-card__number { color: var(--gold); }
+
+/* ── 9. Match Cards ─────────────────────────────────────────── */
+.match-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: .9rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: background var(--transition), transform var(--transition);
+    opacity: 0;
+    animation: fadeSlideIn .35s forwards;
+}
+
+.match-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateX(3px);
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.match-card__time {
+    width: 52px;
+    text-align: center;
+    font-size: .8rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.match-card__teams {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: .75rem;
+}
+
+.match-card__team {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 500;
+    font-size: .9rem;
+}
+
+.match-card__team--away { flex-direction: row-reverse; text-align: right; }
+
+.match-card__team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.match-card__score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 56px;
+}
+
+.match-card__score--live  { color: var(--green); }
+.match-card__score--done  { color: var(--text-primary); }
+.match-card__score--next  { color: var(--text-muted); }
+
+.match-card__stadium {
+    font-size: .75rem;
+    color: var(--text-muted);
+    text-align: right;
+    flex-shrink: 0;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── 10. Badges ─────────────────────────────────────────────── */
+.tc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    border-radius: 100px;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.badge-live {
+    background: rgba(255,23,68,.15);
+    color: var(--red);
+    border: 1px solid rgba(255,23,68,.3);
+    animation: pulse-live 1.5s infinite;
+}
+
+@keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .65; }
+}
+
+.badge-finished {
+    background: rgba(0,230,118,.12);
+    color: var(--green);
+    border: 1px solid rgba(0,230,118,.25);
+}
+
+.badge-upcoming {
+    background: rgba(41,121,255,.12);
+    color: var(--blue);
+    border: 1px solid rgba(41,121,255,.25);
+}
+
+.badge-featured {
+    background: rgba(255,214,0,.12);
+    color: var(--gold);
+    border: 1px solid rgba(255,214,0,.25);
+}
+
+/* ── 11. Form Badges (W/D/L) ────────────────────────────────── */
+.form-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.form-w { background: rgba(0,230,118,.2);  color: var(--green); }
+.form-d { background: rgba(255,214,0,.2);  color: var(--gold);  }
+.form-l { background: rgba(255,23,68,.2);  color: var(--red);   }
+
+/* ── 12. Standings Table ────────────────────────────────────── */
+.standings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.standings-table th {
+    font-size: .75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: .6rem .75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.standings-table td {
+    padding: .65rem .75rem;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+    vertical-align: middle;
+}
+
+.standings-table tr:last-child td { border-bottom: none; }
+
+.standings-table tr:hover td { background: rgba(255,255,255,.03); }
+
+.row-champions td:first-child { border-left: 3px solid var(--green); }
+.row-europe    td:first-child { border-left: 3px solid var(--blue); }
+.row-relegation td:first-child { border-left: 3px solid var(--red); }
+
+.standings-team {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.standings-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.standings-pos {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 24px;
+    text-align: center;
+}
+
+.standings-points {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ── 13. Section Header ─────────────────────────────────────── */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: .03em;
+}
+
+.section-title span { color: var(--green); }
+
+/* ── 14. Week Navigation ────────────────────────────────────── */
+.week-nav {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.week-nav__btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    padding: .4rem .75rem;
+    font-size: .85rem;
+    transition: color var(--transition), border-color var(--transition);
+    cursor: pointer;
+}
+
+.week-nav__btn:hover {
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,.2);
+}
+
+.week-nav__label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* ── 15. Match Detail Timeline ──────────────────────────────── */
+.event-timeline { display: flex; flex-direction: column; gap: .5rem; }
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .6rem .9rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,.03);
+}
+
+.event-item--home { flex-direction: row; }
+.event-item--away { flex-direction: row-reverse; text-align: right; }
+
+.event-item__minute {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+    color: var(--text-muted);
+    min-width: 30px;
+}
+
+.event-item__icon { font-size: 1.1rem; }
+
+.event-item__desc { font-size: .85rem; color: var(--text-muted); }
+
+/* ── 16. Page Header ────────────────────────────────────────── */
+.page-header {
+    padding: 1.5rem 0 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.page-header__title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.page-header__subtitle {
+    color: var(--text-muted);
+    font-size: .9rem;
+    margin-top: .25rem;
+}
+
+/* ── 17. Buttons ────────────────────────────────────────────── */
+.tc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .5rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-size: .875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: opacity var(--transition), transform var(--transition);
+}
+
+.tc-btn:hover { opacity: .85; transform: translateY(-1px); }
+
+.tc-btn--primary   { background: var(--green);  color: #000; }
+.tc-btn--secondary { background: var(--blue);   color: #fff; }
+.tc-btn--ghost     { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
+
+/* ── 18. Error Page ─────────────────────────────────────────── */
+.error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    gap: 1.25rem;
+}
+
+.error-page__code {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--red);
+    line-height: 1;
+}
+
+.error-page__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.error-page__message {
+    color: var(--text-muted);
+    max-width: 420px;
+}
+
+/* ── 19. Footer ─────────────────────────────────────────────── */
+.tc-footer {
+    background: var(--bg-nav);
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.tc-footer__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tc-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--green);
+}
+
+.tc-footer__links {
+    display: flex;
+    gap: 1.25rem;
+    margin-left: auto;
+}
+
+.tc-footer__links a {
+    color: var(--text-muted);
+    font-size: .85rem;
+    transition: color var(--transition);
+}
+
+.tc-footer__links a:hover { color: var(--text-primary); }
+
+.tc-footer__copy {
+    color: var(--text-muted);
+    font-size: .8rem;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding-top: .5rem;
+    border-top: 1px solid var(--border);
+}
+
+/* ── 20. Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .tc-navbar__nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0; right: 0;
+        background: var(--bg-nav);
+        border-bottom: 1px solid var(--border);
+        padding: .75rem;
+        gap: .25rem;
+    }
+
+    .tc-navbar__nav.open { display: flex; }
+
+    .tc-navbar__toggler { display: block; }
+
+    .tc-navbar__container { position: relative; }
+
+    .match-card__stadium { display: none; }
+
+    .match-card__teams {
+        grid-template-columns: 1fr auto 1fr;
+        gap: .5rem;
+    }
+
+    .tc-footer__links { display: none; }
+
+    .standings-table th:nth-child(n+6):not(:last-child),
+    .standings-table td:nth-child(n+6):not(:last-child) { display: none; }
+}
+
+@media (max-width: 480px) {
+    .stat-cards { grid-template-columns: 1fr 1fr; }
+
+    .match-card__team span { display: none; }
+
+    .page-header__title { font-size: 1.5rem; }
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<body>
+<nav th:fragment="navbar" class="tc-navbar" id="mainNavbar">
+    <div class="tc-navbar__container">
+
+        <a th:href="@{/}" class="tc-navbar__brand">
+            <i class="bi bi-shield-fill-check"></i>
+            <span>TactiCore</span>
+        </a>
+
+        <button class="tc-navbar__toggler" id="navToggler" aria-label="Menüyü aç/kapat">
+            <i class="bi bi-list" id="togglerIcon"></i>
+        </button>
+
+        <ul class="tc-navbar__nav" id="navMenu">
+            <li><a th:href="@{/}"        class="tc-navbar__link"><i class="bi bi-house-door"></i> Ana Sayfa</a></li>
+            <li><a th:href="@{/fixtures}" class="tc-navbar__link"><i class="bi bi-calendar3"></i> Fikstür</a></li>
+            <li><a th:href="@{/matches}"  class="tc-navbar__link"><i class="bi bi-trophy"></i> Maçlar</a></li>
+            <li><a th:href="@{/teams}"    class="tc-navbar__link"><i class="bi bi-bar-chart-line"></i> Takımlar</a></li>
+        </ul>
+
+    </div>
+</nav>
+</body>
+</html>

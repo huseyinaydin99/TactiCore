@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<body>
+<footer th:fragment="footer" class="tc-footer">
+    <div class="tc-footer__container">
+        <div class="tc-footer__brand">
+            <i class="bi bi-shield-fill-check"></i>
+            <span>TactiCore</span>
+        </div>
+        <nav class="tc-footer__links">
+            <a th:href="@{/}">Ana Sayfa</a>
+            <a th:href="@{/fixtures}">Fikstür</a>
+            <a th:href="@{/matches}">Maçlar</a>
+            <a th:href="@{/teams}">Takımlar</a>
+        </nav>
+        <p class="tc-footer__copy">
+            &copy; <span th:text="${currentYear}">2026</span> TactiCore &mdash; Tüm hakları saklıdır.
+        </p>
+    </div>
+</footer>
+</body>
+</html>
