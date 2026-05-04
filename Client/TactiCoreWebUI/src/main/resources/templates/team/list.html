@@ -8,10 +8,117 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div class="tc-container">
-        <!-- İçerik PROMPT 7'de doldurulacak -->
-        <p style="color:var(--text-muted);padding:2rem 0;">Yükleniyor...</p>
+<div class="tc-container">
+
+    <!-- ── Sayfa Başlığı ───────────────────────────────────── -->
+    <div class="page-header">
+        <h1 class="page-header__title">Puan Durumu</h1>
+        <p class="page-header__subtitle">
+            <i class="bi bi-table"></i>
+            Sezonun güncel lig sıralaması
+        </p>
     </div>
+
+    <!-- ── Gösterge Açıklaması ────────────────────────────── -->
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;font-size:.8rem;color:var(--text-muted);">
+        <span><span style="display:inline-block;width:12px;height:12px;background:rgba(0,230,118,.15);border-left:3px solid var(--green);margin-right:.4rem;"></span>Şampiyonlar Ligi</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:rgba(239,68,68,.1);border-left:3px solid var(--red);margin-right:.4rem;"></span>Küme Düşme</span>
+    </div>
+
+    <!-- ── Standings Tablosu ──────────────────────────────── -->
+    <div th:if="${not #lists.isEmpty(standings)}" class="tc-card" style="padding:0;overflow:hidden;">
+        <div style="overflow-x:auto;">
+            <table class="standings-table">
+                <thead>
+                    <tr>
+                        <th style="width:3rem;text-align:center;">#</th>
+                        <th>Takım</th>
+                        <th style="text-align:center;width:2.5rem;" title="Oynanan">O</th>
+                        <th style="text-align:center;width:2.5rem;" title="Galibiyet">G</th>
+                        <th style="text-align:center;width:2.5rem;" title="Beraberlik">B</th>
+                        <th style="text-align:center;width:2.5rem;" title="Mağlubiyet">M</th>
+                        <th style="text-align:center;width:3rem;" title="Attığı Gol">AG</th>
+                        <th style="text-align:center;width:3rem;" title="Yediği Gol">YG</th>
+                        <th style="text-align:center;width:3rem;" title="Averaj">AV</th>
+                        <th style="text-align:center;width:3.5rem;font-weight:700;">Puan</th>
+                        <th style="text-align:center;width:7rem;">Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="standing : ${standings}"
+                        th:classappend="${standing.position <= 4} ? 'row-champions' :
+                                       (${standing.position > (#lists.size(standings) - 3)} ? 'row-relegation' : '')">
+
+                        <!-- Sıra -->
+                        <td style="text-align:center;font-weight:700;color:var(--text-muted);"
+                            th:text="${standing.position}">1</td>
+
+                        <!-- Takım: Logo + Ad -->
+                        <td>
+                            <div style="display:flex;align-items:center;gap:.65rem;">
+                                <img th:if="${standing.logoUrl != null and !#strings.isEmpty(standing.logoUrl)}"
+                                     th:src="${standing.logoUrl}"
+                                     style="width:24px;height:24px;object-fit:contain;"
+                                     th:alt="${standing.teamName}">
+                                <div>
+                                    <span style="font-weight:600;"
+                                          th:text="${standing.teamName}">Takım</span>
+                                    <span style="font-size:.75rem;color:var(--text-muted);margin-left:.4rem;"
+                                          th:text="${standing.shortName}"></span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Oynanan -->
+                        <td style="text-align:center;" th:text="${standing.played}">0</td>
+                        <!-- Galibiyet -->
+                        <td style="text-align:center;" th:text="${standing.won}">0</td>
+                        <!-- Beraberlik -->
+                        <td style="text-align:center;" th:text="${standing.draw}">0</td>
+                        <!-- Mağlubiyet -->
+                        <td style="text-align:center;" th:text="${standing.lost}">0</td>
+                        <!-- AG -->
+                        <td style="text-align:center;" th:text="${standing.goalsFor}">0</td>
+                        <!-- YG -->
+                        <td style="text-align:center;" th:text="${standing.goalsAgainst}">0</td>
+                        <!-- Averaj -->
+                        <td style="text-align:center;"
+                            th:text="${standing.goalDifference > 0 ? '+' + standing.goalDifference : standing.goalDifference}">0</td>
+
+                        <!-- Puan -->
+                        <td style="text-align:center;">
+                            <span style="font-weight:700;font-size:1.05rem;color:var(--green);"
+                                  th:text="${standing.points}">0</span>
+                        </td>
+
+                        <!-- Form -->
+                        <td style="text-align:center;">
+                            <div style="display:flex;gap:.2rem;justify-content:center;"
+                                 th:if="${standing.form != null and !#strings.isEmpty(standing.form)}">
+                                <span th:each="i : ${#numbers.sequence(0, #strings.length(standing.form) - 1)}"
+                                      th:with="ch=${#strings.substring(standing.form, i, i + 1)}"
+                                      th:class="${ch == 'W'} ? 'tc-badge form-w' :
+                                               (${ch == 'D'} ? 'tc-badge form-d' :
+                                               (${ch == 'L'} ? 'tc-badge form-l' : 'tc-badge'))"
+                                      th:text="${ch}">W</span>
+                            </div>
+                            <span th:if="${standing.form == null or #strings.isEmpty(standing.form)}"
+                                  style="color:var(--text-muted);">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Boş durum -->
+    <div th:if="${#lists.isEmpty(standings)}"
+         style="text-align:center;padding:3rem;color:var(--text-muted);">
+        <i class="bi bi-table" style="font-size:2.5rem;display:block;margin-bottom:.75rem;"></i>
+        Puan durumu verisi bulunamadı.
+    </div>
+
+</div>
 </div>
 </body>
 </html>

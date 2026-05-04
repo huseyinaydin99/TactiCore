@@ -4,14 +4,172 @@
       layout:decorate="~{layout/default}"
       lang="tr">
 <head>
-    <title>TactiCore — Fikstür</title>
+    <title th:text="|TactiCore - ${fixturePageViewModel.currentWeek}. Hafta|">TactiCore - Fikstür</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <div class="tc-container">
-        <!-- İçerik PROMPT 7'de doldurulacak -->
-        <p style="color:var(--text-muted);padding:2rem 0;">Yükleniyor...</p>
+<div class="tc-container">
+
+    <!-- ── Sayfa Başlığı ───────────────────────────────────── -->
+    <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+            <div>
+                <h1 class="page-header__title">
+                    <span style="color:var(--green)" th:text="${fixturePageViewModel.currentWeek}">33</span>. Hafta Fikstürü
+                </h1>
+                <p class="page-header__subtitle">
+                    <i class="bi bi-calendar3"></i>
+                    Tüm maçlar, canlı skorlar ve öne çıkan karşılaşmalar
+                </p>
+            </div>
+
+            <!-- Hafta navigasyonu -->
+            <div class="week-nav">
+                <a th:href="@{/fixtures(week=|${fixturePageViewModel.previousWeek}.Hafta|)}"
+                   class="week-nav__btn tc-btn tc-btn--ghost">
+                    <i class="bi bi-chevron-left"></i>
+                    <span th:text="${fixturePageViewModel.previousWeek}">32</span>. Hafta
+                </a>
+                <span class="week-nav__label"
+                      th:text="|${fixturePageViewModel.currentWeek}. Hafta|">33. Hafta</span>
+                <a th:href="@{/fixtures(week=|${fixturePageViewModel.nextWeek}.Hafta|)}"
+                   class="week-nav__btn tc-btn tc-btn--ghost">
+                    <span th:text="${fixturePageViewModel.nextWeek}">34</span>. Hafta
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
     </div>
+
+    <!-- ── Canlı Maç Banner'ı ──────────────────────────────── -->
+    <div th:if="${not #lists.isEmpty(fixturePageViewModel.liveMatches)}"
+         style="background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.25);
+                border-radius:var(--radius-md);padding:.85rem 1.1rem;margin-bottom:1.25rem;
+                display:flex;align-items:center;gap:.75rem;">
+        <span class="tc-badge badge-live"><i class="bi bi-broadcast"></i> CANLI</span>
+        <span style="font-size:.9rem;color:var(--text-muted);">
+            <span th:text="${#lists.size(fixturePageViewModel.liveMatches)}">1</span> maç şu an oynanıyor
+        </span>
+    </div>
+
+    <!-- ── Özet Kartlar ────────────────────────────────────── -->
+    <div class="stat-cards" style="margin-bottom:1.5rem;"
+         th:if="${fixturePageViewModel.summary != null}">
+        <div class="stat-card stat-card--total">
+            <div class="stat-card__number"
+                 th:text="${fixturePageViewModel.summary.totalMatches}">0</div>
+            <div class="stat-card__label">Toplam</div>
+        </div>
+        <div class="stat-card stat-card--live">
+            <div class="stat-card__number"
+                 th:text="${fixturePageViewModel.summary.liveCount}">0</div>
+            <div class="stat-card__label">Canlı</div>
+        </div>
+        <div class="stat-card stat-card--done">
+            <div class="stat-card__number"
+                 th:text="${fixturePageViewModel.summary.finishedCount}">0</div>
+            <div class="stat-card__label">Tamamlandı</div>
+        </div>
+        <div class="stat-card stat-card--next">
+            <div class="stat-card__number"
+                 th:text="${fixturePageViewModel.summary.upcomingCount}">0</div>
+            <div class="stat-card__label">Yaklaşan</div>
+        </div>
+    </div>
+
+    <!-- ── Maç Listesi ─────────────────────────────────────── -->
+    <div class="section-header">
+        <h2 class="section-title">Maçlar</h2>
+        <span style="font-size:.85rem;color:var(--text-muted);"
+              th:text="|${#lists.size(fixturePageViewModel.fixtures)} maç|">0 maç</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.6rem;"
+         th:if="${not #lists.isEmpty(fixturePageViewModel.fixtures)}">
+
+        <div th:each="fixture : ${fixturePageViewModel.fixtures}" class="match-card">
+
+            <!-- Saat / Dakika -->
+            <div class="match-card__time">
+                <th:block th:if="${fixture.status.name() == 'LIVE'}">
+                    <span style="color:var(--red);font-weight:700;"
+                          th:text="${fixture.minute + &quot;'&quot;}">45'</span>
+                </th:block>
+                <th:block th:unless="${fixture.status.name() == 'LIVE'}">
+                    <span th:text="${fixture.matchDate != null ? #temporals.format(fixture.matchDate,'HH:mm') : '--:--'}">20:00</span>
+                </th:block>
+            </div>
+
+            <!-- Takımlar + Skor -->
+            <div class="match-card__teams">
+
+                <!-- Ev sahibi -->
+                <div class="match-card__team">
+                    <img th:if="${fixture.homeTeamLogoUrl != null and !#strings.isEmpty(fixture.homeTeamLogoUrl)}"
+                         th:src="${fixture.homeTeamLogoUrl}"
+                         class="match-card__team-logo"
+                         th:alt="${fixture.homeTeamName}">
+                    <span th:text="${fixture.homeTeamName}">Ev Sahibi</span>
+                </div>
+
+                <!-- Skor -->
+                <div th:class="'match-card__score ' +
+                    (${fixture.status.name() == 'LIVE'}     ? 'match-card__score--live' :
+                    (${fixture.status.name() == 'FINISHED'} ? 'match-card__score--done' :
+                                                              'match-card__score--next'))">
+                    <th:block th:if="${fixture.status.name() != 'UPCOMING'}">
+                        <span th:text="${fixture.homeScore}">0</span>
+                        <span style="margin:0 .2rem">–</span>
+                        <span th:text="${fixture.awayScore}">0</span>
+                    </th:block>
+                    <th:block th:if="${fixture.status.name() == 'UPCOMING'}">
+                        <span>VS</span>
+                    </th:block>
+                </div>
+
+                <!-- Deplasman -->
+                <div class="match-card__team match-card__team--away">
+                    <img th:if="${fixture.awayTeamLogoUrl != null and !#strings.isEmpty(fixture.awayTeamLogoUrl)}"
+                         th:src="${fixture.awayTeamLogoUrl}"
+                         class="match-card__team-logo"
+                         th:alt="${fixture.awayTeamName}">
+                    <span th:text="${fixture.awayTeamName}">Deplasman</span>
+                </div>
+            </div>
+
+            <!-- Stad + Badge -->
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;flex-shrink:0;">
+                <th:block th:switch="${fixture.status.name()}">
+                    <span th:case="'LIVE'"     class="tc-badge badge-live">
+                        <i class="bi bi-broadcast"></i> CANLI
+                    </span>
+                    <span th:case="'FINISHED'" class="tc-badge badge-finished">
+                        <i class="bi bi-check-circle"></i> BİTTİ
+                    </span>
+                    <span th:case="'UPCOMING'" class="tc-badge badge-upcoming">
+                        <i class="bi bi-clock"></i> YAKLAŞAN
+                    </span>
+                </th:block>
+                <span class="match-card__stadium"
+                      th:if="${fixture.stadium != null}"
+                      th:text="${fixture.stadium}"></span>
+                <span th:if="${fixture.featured}"
+                      class="tc-badge badge-featured" style="font-size:.65rem;">
+                    <i class="bi bi-star-fill"></i> ÖNE ÇIKAN
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Boş durum -->
+    <div th:if="${#lists.isEmpty(fixturePageViewModel.fixtures)}"
+         style="text-align:center;padding:3rem;color:var(--text-muted);">
+        <i class="bi bi-calendar-x" style="font-size:2.5rem;display:block;margin-bottom:.75rem;"></i>
+        Bu hafta için maç bulunamadı.
+    </div>
+
+</div>
 </div>
 </body>
 </html>
