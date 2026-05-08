@@ -7,6 +7,22 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: toor
+  redis-commander:
+    image: rediscommander/redis-commander
+    container_name: redis-commander
+    ports:
+      - "8083:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379
 
   redis:
     image: redis:7.2-alpine
