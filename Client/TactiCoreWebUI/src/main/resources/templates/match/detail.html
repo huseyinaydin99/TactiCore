@@ -48,10 +48,9 @@
 
             <!-- Skor -->
             <div>
-                <div th:class="'match-card__score ' +
-                    (${matchDetail.match.status.name() == 'LIVE'}     ? 'match-card__score--live' :
-                    (${matchDetail.match.status.name() == 'FINISHED'} ? 'match-card__score--done' :
-                                                                        'match-card__score--next'))"
+                <div class="match-card__score"
+                     th:with="smod=${matchDetail.match.status.name() == 'LIVE'} ? 'live' : (${matchDetail.match.status.name() == 'FINISHED'} ? 'done' : 'next')"
+                     th:classappend="${'match-card__score--' + smod}"
                      style="font-size:3rem;">
                     <th:block th:if="${matchDetail.match.status.name() != 'UPCOMING'}">
                         <span th:text="${matchDetail.match.homeScore}">0</span>
@@ -108,8 +107,8 @@
          class="event-timeline">
 
         <div th:each="event : ${matchDetail.events}"
-             th:class="'event-item ' +
-                (${event.teamId == matchDetail.match.homeTeamId} ? 'event-item--home' : 'event-item--away')">
+             class="event-item"
+             th:classappend="${event.teamId == matchDetail.match.homeTeamId} ? 'event-item--home' : 'event-item--away'">
 
             <!-- Dakika -->
             <span class="event-item__minute"

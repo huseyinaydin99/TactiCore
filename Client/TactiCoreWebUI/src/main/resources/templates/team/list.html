@@ -46,8 +46,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="standing : ${standings}"
-                        th:classappend="${standing.position <= 4} ? 'row-champions' :
-                                       (${standing.position > (#lists.size(standings) - 3)} ? 'row-relegation' : '')">
+                        th:classappend="${standing.position <= 4} ? 'row-champions' : (${standing.position > #lists.size(standings) - 3} ? 'row-relegation' : '')">
 
                         <!-- Sıra -->
                         <td style="text-align:center;font-weight:700;color:var(--text-muted);"
@@ -97,9 +96,7 @@
                                  th:if="${standing.form != null and !#strings.isEmpty(standing.form)}">
                                 <span th:each="i : ${#numbers.sequence(0, #strings.length(standing.form) - 1)}"
                                       th:with="ch=${#strings.substring(standing.form, i, i + 1)}"
-                                      th:class="${ch == 'W'} ? 'tc-badge form-w' :
-                                               (${ch == 'D'} ? 'tc-badge form-d' :
-                                               (${ch == 'L'} ? 'tc-badge form-l' : 'tc-badge'))"
+                                      th:class="${ch == 'W'} ? 'tc-badge form-w' : (${ch == 'D'} ? 'tc-badge form-d' : (${ch == 'L'} ? 'tc-badge form-l' : 'tc-badge'))"
                                       th:text="${ch}">W</span>
                             </div>
                             <span th:if="${standing.form == null or #strings.isEmpty(standing.form)}"

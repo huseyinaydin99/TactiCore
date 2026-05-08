@@ -113,10 +113,9 @@
                 </div>
 
                 <!-- Skor -->
-                <div th:class="'match-card__score ' +
-                    (${fixture.status.name() == 'LIVE'}     ? 'match-card__score--live' :
-                    (${fixture.status.name() == 'FINISHED'} ? 'match-card__score--done' :
-                                                              'match-card__score--next'))">
+                <div class="match-card__score"
+                     th:with="smod=${fixture.status.name() == 'LIVE'} ? 'live' : (${fixture.status.name() == 'FINISHED'} ? 'done' : 'next')"
+                     th:classappend="${'match-card__score--' + smod}">
                     <th:block th:if="${fixture.status.name() != 'UPCOMING'}">
                         <span th:text="${fixture.homeScore}">0</span>
                         <span style="margin:0 .2rem">–</span>

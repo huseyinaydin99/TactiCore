@@ -1,0 +1,46 @@
+cd Server/TactiCoreWebAPI/src/resources/
+docker compose up -d
+
+---
+Data doldurma MongoDB içindir:
+Önce seed.js dosyanın bulunduğu dizine geç ana dizin.
+
+Sonra container adın mongodb ise şu komutu çalıştır:
+
+docker exec -i mongodb mongosh "mongodb://localhost:27017/tacticore" < seed.js
+
+Kontrol etmek için:
+
+docker exec -it mongodb mongosh
+
+Sonra:
+
+show dbs
+use tacticore
+show collections
+db.collectionName.find()
+
+Container adı farklıysa öğren:
+
+docker ps
+
+NAMES sütunundaki adı kullan.
+
+---
+
+Sonra:
+
+use tacticore
+show collections
+
+Bir collection içindeki verileri okumak için:
+
+db.collectionAdi.find().pretty()
+
+Örnek:
+
+db.users.find().pretty()
+
+İlk 10 kayıt:
+
+db.users.find().limit(10).pretty()

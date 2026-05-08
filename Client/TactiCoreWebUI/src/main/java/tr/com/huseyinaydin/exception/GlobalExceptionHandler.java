@@ -1,5 +1,6 @@
 package tr.com.huseyinaydin.exception;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
@@ -8,7 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -38,6 +41,11 @@ public class GlobalExceptionHandler {
                 "Bağlantı kurulamadı: API çalışmıyor olabilir. Lütfen daha sonra tekrar deneyin.");
         model.addAttribute("errorTime", LocalDateTime.now());
         return "error/error";
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public void handleNoResource(NoResourceFoundException ex, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

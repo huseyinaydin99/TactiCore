@@ -58,10 +58,9 @@
                 </div>
 
                 <!-- Skor -->
-                <div th:class="'match-card__score ' +
-                    (${match.status.name() == 'LIVE'}     ? 'match-card__score--live' :
-                    (${match.status.name() == 'FINISHED'} ? 'match-card__score--done' :
-                                                            'match-card__score--next'))">
+                <div class="match-card__score"
+                     th:with="smod=${match.status.name() == 'LIVE'} ? 'live' : (${match.status.name() == 'FINISHED'} ? 'done' : 'next')"
+                     th:classappend="${'match-card__score--' + smod}">
                     <th:block th:if="${match.status.name() != 'UPCOMING'}">
                         <span th:text="${match.homeScore}">0</span>
                         <span style="margin:0 .2rem">–</span>
