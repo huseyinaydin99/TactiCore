@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import tr.com.huseyinaydin.service.ApiServiceFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public abstract class AbstractBaseController {
 
@@ -18,7 +19,8 @@ public abstract class AbstractBaseController {
     protected String handleError(Model model, Exception ex, String fallbackView) {
         log.error("Controller hatası [{}]: {}", fallbackView, ex.getMessage(), ex);
         model.addAttribute("errorMessage", ex.getMessage());
-        return fallbackView;
+        model.addAttribute("errorTime", LocalDateTime.now());
+        return "error/error";
     }
 
     protected void addCommonAttributes(Model model) {

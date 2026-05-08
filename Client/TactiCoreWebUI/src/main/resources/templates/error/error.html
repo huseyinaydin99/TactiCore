@@ -11,7 +11,8 @@
     <div class="tc-container">
         <div class="error-page">
             <div class="error-page__code">
-                <i class="bi bi-exclamation-triangle"></i>
+                <span th:if="${statusCode}" th:text="${statusCode}"></span>
+                <i th:unless="${statusCode}" class="bi bi-exclamation-triangle"></i>
             </div>
             <h1 class="error-page__title">Bir sorun oluştu</h1>
             <p class="error-page__message"
