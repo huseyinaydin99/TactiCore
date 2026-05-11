@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayit Ol | TactiCore</title>
+    <link rel="icon" href="data:,">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+    <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="auth-body">
+
+    <!-- Sol: Hero Alan -->
+    <div class="auth-hero">
+        <div class="auth-pitch-circle"></div>
+        <div class="auth-pitch-line"></div>
+        <div class="auth-hero-glow"></div>
+
+        <div class="auth-hero-content">
+            <div class="auth-logo">
+                <i class="bi bi-shield-fill-check"></i>
+                TactiCore
+            </div>
+            <p class="auth-tagline">Futbolun Dijital Kalesi</p>
+
+            <div class="auth-hero-register-info">
+                <div class="auth-register-step">
+                    <div class="auth-register-step__num">01</div>
+                    <div>
+                        <strong>Hesap Olustur</strong>
+                        <span>Kullanici adi ve sifre belirle</span>
+                    </div>
+                </div>
+                <div class="auth-register-step">
+                    <div class="auth-register-step__num">02</div>
+                    <div>
+                        <strong>Admin Paneline Eriş</strong>
+                        <span>Tum yonetim araclarini kullan</span>
+                    </div>
+                </div>
+                <div class="auth-register-step">
+                    <div class="auth-register-step__num">03</div>
+                    <div>
+                        <strong>Veri Yonet</strong>
+                        <span>Mac, takim ve oyuncu ekle</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-hero-stat-row" style="margin-top:2.5rem;">
+                <div class="auth-hero-stat">
+                    <span class="auth-hero-stat__num">100%</span>
+                    <span class="auth-hero-stat__label">Ucretsiz</span>
+                </div>
+                <div class="auth-hero-stat-divider"></div>
+                <div class="auth-hero-stat">
+                    <span class="auth-hero-stat__num">Anlik</span>
+                    <span class="auth-hero-stat__label">Erisim</span>
+                </div>
+                <div class="auth-hero-stat-divider"></div>
+                <div class="auth-hero-stat">
+                    <span class="auth-hero-stat__num">Tam</span>
+                    <span class="auth-hero-stat__label">Yetki</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sag: Form Paneli -->
+    <div class="auth-panel">
+        <div class="auth-card">
+
+            <a th:href="@{/login}" class="auth-card-back">
+                <i class="bi bi-arrow-left"></i> Girise Don
+            </a>
+
+            <div class="auth-card-header">
+                <div class="auth-card-icon" style="background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.2);">
+                    <i class="bi bi-person-plus-fill" style="color:var(--green);"></i>
+                </div>
+                <h1>Hesap Olustur</h1>
+                <p class="auth-card-subtitle">TactiCore Admin'e katil</p>
+            </div>
+
+            <!-- Mesajlar -->
+            <div th:if="${errorMessage}" class="auth-alert auth-alert--error">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <div th:if="${successMessage}" class="auth-alert auth-alert--success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <form action="/register" method="post" class="auth-form" id="regForm">
+
+                <div class="auth-field">
+                    <label class="auth-field__label">Kullanici Adi</label>
+                    <div class="auth-field__wrap">
+                        <i class="bi bi-person-fill auth-field__icon"></i>
+                        <input type="text" name="username" id="regUsername"
+                               class="auth-field__input"
+                               placeholder="kullanici_adi" autocomplete="username"
+                               minlength="3" required oninput="checkForm()">
+                    </div>
+                    <span class="auth-field__hint">En az 3 karakter</span>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-field__label">Sifre</label>
+                    <div class="auth-field__wrap">
+                        <i class="bi bi-lock-fill auth-field__icon"></i>
+                        <input type="password" name="password" id="regPassword"
+                               class="auth-field__input"
+                               placeholder="••••••••" autocomplete="new-password"
+                               minlength="6" required oninput="checkForm()">
+                        <button type="button" class="auth-field__eye" onclick="togglePass('regPassword', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="auth-strength" id="strengthBar">
+                        <div class="auth-strength__bar" id="strengthFill"></div>
+                    </div>
+                    <span class="auth-field__hint" id="strengthLabel">En az 6 karakter</span>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-field__label">Sifre Tekrar</label>
+                    <div class="auth-field__wrap">
+                        <i class="bi bi-lock-fill auth-field__icon"></i>
+                        <input type="password" name="confirmPassword" id="regConfirm"
+                               class="auth-field__input"
+                               placeholder="••••••••" autocomplete="new-password"
+                               required oninput="checkForm()">
+                        <button type="button" class="auth-field__eye" onclick="togglePass('regConfirm', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span class="auth-field__hint auth-field__hint--match" id="matchHint" style="display:none;"></span>
+                </div>
+
+                <button type="submit" class="auth-submit-btn auth-submit-btn--green" id="regSubmit">
+                    <i class="bi bi-person-check-fill"></i>
+                    Kayit Ol
+                </button>
+
+            </form>
+
+            <div class="auth-separator">
+                <span>veya</span>
+            </div>
+
+            <p class="auth-switch">
+                Zaten hesabiniz var mi?
+                <a th:href="@{/login}">Giris Yap</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script>
+        function togglePass(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        function getStrength(pw) {
+            var score = 0;
+            if (pw.length >= 6)  score++;
+            if (pw.length >= 10) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return score;
+        }
+
+        var strengthColors = ['', 'var(--red)', 'var(--gold)', 'var(--gold)', 'var(--green)', 'var(--green)'];
+        var strengthLabels = ['', 'Cok zayif', 'Zayif', 'Orta', 'Guclu', 'Cok guclu'];
+
+        function checkForm() {
+            var pw     = document.getElementById('regPassword').value;
+            var conf   = document.getElementById('regConfirm').value;
+            var fill   = document.getElementById('strengthFill');
+            var label  = document.getElementById('strengthLabel');
+            var hint   = document.getElementById('matchHint');
+
+            var score = pw.length > 0 ? getStrength(pw) : 0;
+            fill.style.width = (score * 20) + '%';
+            fill.style.background = strengthColors[score] || 'var(--border)';
+            label.textContent = pw.length > 0 ? strengthLabels[score] : 'En az 6 karakter';
+            label.style.color = strengthColors[score] || 'var(--text-muted)';
+
+            if (conf.length > 0) {
+                hint.style.display = '';
+                if (pw === conf) {
+                    hint.textContent = 'Sifreler uyusuyor';
+                    hint.style.color = 'var(--green)';
+                } else {
+                    hint.textContent = 'Sifreler eslesmiyor';
+                    hint.style.color = 'var(--red)';
+                }
+            } else {
+                hint.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkForm);
+    </script>
+</body>
+</html>

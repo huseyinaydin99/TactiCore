@@ -32,12 +32,12 @@
                 <span class="admin-sidebar__section-label">Genel</span>
                 <a th:href="@{/admin}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI == '/admin' or #request.requestURI == '/admin/'} ? 'admin-sidebar__link--active' : ''">
+                   th:classappend="${currentUri == '/admin' or currentUri == '/admin/'} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
                 <a th:href="@{/fixtures}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI.startsWith('/fixtures')} ? 'admin-sidebar__link--active' : ''">
+                   th:classappend="${currentUri.startsWith('/fixtures')} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-calendar3"></i> Fikstür
                 </a>
             </div>
@@ -46,17 +46,17 @@
                 <span class="admin-sidebar__section-label">Yönetim</span>
                 <a th:href="@{/admin/teams}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI.startsWith('/admin/teams') and !#request.requestURI.startsWith('/admin/teams/new')} ? 'admin-sidebar__link--active' : ''">
+                   th:classappend="${currentUri.startsWith('/admin/teams') and !currentUri.startsWith('/admin/teams/add')} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-shield"></i> Takımlar
                 </a>
                 <a th:href="@{/admin/teams/add}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI.startsWith('/admin/teams/add')} ? 'admin-sidebar__link--active' : ''">
+                   th:classappend="${currentUri.startsWith('/admin/teams/add')} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-plus-circle"></i> Takim Ekle
                 </a>
                 <a th:href="@{/admin/matches}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI.startsWith('/admin/matches')} ? 'admin-sidebar__link--active' : ''">
+                   th:classappend="${currentUri.startsWith('/admin/matches')} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-trophy"></i> Maç Yönetimi
                 </a>
             </div>

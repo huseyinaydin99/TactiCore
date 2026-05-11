@@ -30,6 +30,11 @@ public class AdminTeamController extends AbstractBaseController {
         }
     }
 
+    @GetMapping("/new")
+    public String newRedirect() {
+        return "redirect:/admin/teams/add";
+    }
+
     @GetMapping("/add")
     public String addForm(Model model) {
         addCommonAttributes(model);
