@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- ── 6 Stat Kartı ─────────────────────────────────────── -->
+    <div class="admin-stat-grid">
+
+        <div class="admin-stat-card admin-stat-card--live">
+            <div class="admin-stat-card__icon"><i class="bi bi-broadcast"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.liveCount}">0</div>
+            <div class="admin-stat-card__label">Canlı Maç</div>
+        </div>
+
+        <div class="admin-stat-card admin-stat-card--done">
+            <div class="admin-stat-card__icon"><i class="bi bi-check-circle"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.finishedCount}">0</div>
+            <div class="admin-stat-card__label">Biten Maç</div>
+        </div>
+
+        <div class="admin-stat-card admin-stat-card--next">
+            <div class="admin-stat-card__icon"><i class="bi bi-clock"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.upcomingCount}">0</div>
+            <div class="admin-stat-card__label">Yaklaşan Maç</div>
+        </div>
+
+        <div class="admin-stat-card admin-stat-card--total">
+            <div class="admin-stat-card__icon"><i class="bi bi-trophy"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.totalMatchCount}">0</div>
+            <div class="admin-stat-card__label">Toplam Maç</div>
+        </div>
+
+        <div class="admin-stat-card admin-stat-card--teams">
+            <div class="admin-stat-card__icon"><i class="bi bi-shield"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.teamCount}">0</div>
+            <div class="admin-stat-card__label">Takım</div>
+        </div>
+
+        <div class="admin-stat-card admin-stat-card--players">
+            <div class="admin-stat-card__icon"><i class="bi bi-person-fill"></i></div>
+            <div class="admin-stat-card__value" th:text="${adminDashboard.playerCount}">0</div>
+            <div class="admin-stat-card__label">Oyuncu</div>
+        </div>
+
+    </div>
+
+    <!-- ── Orta Alan: Öne Çıkan Maç + Hızlı Erişim ──────────── -->
+    <div class="admin-mid-grid">
+
+        <!-- Öne Çıkan Maç -->
+        <div class="tc-card">
+            <div class="section-header" style="margin-bottom:1.25rem;">
+                <h2 class="section-title"><span>Öne</span> Çıkan Maç</h2>
+                <span class="tc-badge badge-featured"><i class="bi bi-star-fill"></i> Öne Çıkan</span>
+            </div>
+
+            <div th:if="${adminDashboard.featuredMatch != null}"
+                 style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1.5rem;text-align:center;">
+
+                <!-- Ev sahibi -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem;">
+                    <img th:if="${adminDashboard.featuredMatch.homeTeamLogoUrl != null}"
+                         th:src="${adminDashboard.featuredMatch.homeTeamLogoUrl}"
+                         style="width:56px;height:56px;object-fit:contain;"
+                         th:alt="${adminDashboard.featuredMatch.homeTeamName}">
+                    <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;"
+                          th:text="${adminDashboard.featuredMatch.homeTeamName}">Ev Sahibi</span>
+                    <span style="font-size:.72rem;color:var(--text-muted);">EV SAHİBİ</span>
+                </div>
+
+                <!-- Skor -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:700;color:var(--text-primary);line-height:1;">
+                        <span th:text="${adminDashboard.featuredMatch.homeScore}">0</span>
+                        <span style="color:var(--text-muted);margin:0 .2rem;">-</span>
+                        <span th:text="${adminDashboard.featuredMatch.awayScore}">0</span>
+                    </div>
+                    <span th:if="${adminDashboard.featuredMatch.stadium != null}"
+                          style="font-size:.78rem;color:var(--text-muted);">
+                        <i class="bi bi-geo-alt"></i>
+                        <span th:text="${adminDashboard.featuredMatch.stadium}"></span>
+                    </span>
+                    <a th:href="@{/matches/{id}(id=${adminDashboard.featuredMatch.id})}"
+                       class="tc-btn tc-btn--ghost" style="font-size:.78rem;padding:.3rem .7rem;margin-top:.25rem;">
+                        <i class="bi bi-eye"></i> Maç Detayı
+                    </a>
+                </div>
+
+                <!-- Deplasman -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem;">
+                    <img th:if="${adminDashboard.featuredMatch.awayTeamLogoUrl != null}"
+                         th:src="${adminDashboard.featuredMatch.awayTeamLogoUrl}"
+                         style="width:56px;height:56px;object-fit:contain;"
+                         th:alt="${adminDashboard.featuredMatch.awayTeamName}">
+                    <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;"
+                          th:text="${adminDashboard.featuredMatch.awayTeamName}">Deplasman</span>
+                    <span style="font-size:.72rem;color:var(--text-muted);">DEPLASMAN</span>
+                </div>
+            </div>
+
+            <div th:unless="${adminDashboard.featuredMatch != null}"
+                 style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted);">
+                <i class="bi bi-star" style="font-size:2rem;display:block;margin-bottom:.6rem;"></i>
+                Öne çıkan maç bulunmuyor.
+            </div>
+        </div>
+
+        <!-- Hızlı Erişim -->
+        <div class="tc-card">
+            <div class="section-header" style="margin-bottom:1.25rem;">
+                <h2 class="section-title">Hızlı Erişim</h2>
+            </div>
+            <div class="admin-quick-links">
+                <a th:href="@{/admin/teams/new}" class="tc-btn tc-btn--primary">
+                    <i class="bi bi-plus-circle"></i> Yeni Takım Ekle
+                </a>
+                <a th:href="@{/admin/matches}" class="tc-btn tc-btn--secondary">
+                    <i class="bi bi-trophy"></i> Maç Yönetimi
+                </a>
+                <a th:href="@{/admin/teams}" class="tc-btn tc-btn--ghost">
+                    <i class="bi bi-shield"></i> Tüm Takımlar
+                </a>
+                <a th:href="@{/live}" class="tc-btn tc-btn--ghost" style="color:var(--red);border-color:rgba(255,23,68,.3);">
+                    <span class="live-dot"></span> Canlı Skorlar
+                </a>
+            </div>
+
+            <div th:if="${adminDashboard.eventSummary != null}"
+                 style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);">
+                <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.75rem;">
+                    Sezon İstatistikleri
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+                    <div style="text-align:center;background:rgba(0,230,118,.07);border-radius:var(--radius-sm);padding:.6rem .5rem;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--green);"
+                             th:text="${adminDashboard.eventSummary.totalGoals}">0</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Gol</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,214,0,.07);border-radius:var(--radius-sm);padding:.6rem .5rem;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--gold);"
+                             th:text="${adminDashboard.eventSummary.totalYellowCards}">0</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Sarı Kart</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,23,68,.07);border-radius:var(--radius-sm);padding:.6rem .5rem;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--red);"
+                             th:text="${adminDashboard.eventSummary.totalRedCards}">0</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Kırmızı Kart</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(41,121,255,.07);border-radius:var(--radius-sm);padding:.6rem .5rem;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;color:var(--blue);"
+                             th:text="${adminDashboard.eventSummary.totalSubstitutions}">0</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Oyuncu Değişimi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Alt Alan: Son Maçlar + Gol Krallığı ──────────────── -->
+    <div class="admin-bottom-grid">
+
+        <!-- Son Maçlar Tablosu -->
+        <div class="tc-card">
+            <div class="section-header" style="margin-bottom:1rem;">
+                <h2 class="section-title">Son Maçlar</h2>
+                <a th:href="@{/matches}" class="tc-btn tc-btn--ghost" style="font-size:.78rem;padding:.3rem .7rem;">
+                    Tümünü Gör <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(adminDashboard.recentMatches)}"
+                 style="text-align:center;padding:2rem;color:var(--text-muted);">
+                Henüz maç bulunmuyor.
+            </div>
+
+            <table th:unless="${#lists.isEmpty(adminDashboard.recentMatches)}" class="standings-table">
+                <thead>
+                    <tr>
+                        <th>Ev Sahibi</th>
+                        <th style="text-align:center;">Skor</th>
+                        <th>Deplasman</th>
+                        <th style="text-align:center;">Durum</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="match : ${adminDashboard.recentMatches}">
+                        <td>
+                            <div style="display:flex;align-items:center;gap:.5rem;">
+                                <img th:if="${match.homeTeamLogoUrl != null}"
+                                     th:src="${match.homeTeamLogoUrl}"
+                                     style="width:20px;height:20px;object-fit:contain;">
+                                <span th:text="${match.homeTeamName}">Ev Sahibi</span>
+                            </div>
+                        </td>
+                        <td style="text-align:center;">
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;"
+                                  th:text="|${match.homeScore} - ${match.awayScore}|">0 - 0</span>
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:.5rem;">
+                                <img th:if="${match.awayTeamLogoUrl != null}"
+                                     th:src="${match.awayTeamLogoUrl}"
+                                     style="width:20px;height:20px;object-fit:contain;">
+                                <span th:text="${match.awayTeamName}">Deplasman</span>
+                            </div>
+                        </td>
+                        <td style="text-align:center;">
+                            <span th:switch="${match.status.name()}">
+                                <span th:case="'LIVE'"     class="tc-badge badge-live">Canlı</span>
+                                <span th:case="'FINISHED'" class="tc-badge badge-finished">Bitti</span>
+                                <span th:case="*"          class="tc-badge badge-upcoming" th:text="${match.status.name()}">Yaklaşan</span>
+                            </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/matches/{id}(id=${match.id})}"
+                               class="tc-btn tc-btn--ghost" style="font-size:.75rem;padding:.25rem .6rem;">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Gol Krallığı -->
+        <div class="tc-card">
+            <div class="section-header" style="margin-bottom:1rem;">
+                <h2 class="section-title">Gol Krallığı</h2>
+                <span style="font-size:.8rem;color:var(--text-muted);">Top 5</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(adminDashboard.topScorers)}"
+                 style="text-align:center;padding:2rem;color:var(--text-muted);">
+                Oyuncu verisi bulunamadı.
+            </div>
+
+            <div th:each="player, stat : ${adminDashboard.topScorers}" class="admin-scorer-item">
+                <span class="admin-scorer-rank" th:text="${stat.count}">1</span>
+                <img th:if="${player.imageUrl != null}"
+                     th:src="${player.imageUrl}"
+                     style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--border);">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                         th:text="${player.fullName}">Oyuncu</div>
+                    <div style="font-size:.75rem;color:var(--text-muted);"
+                         th:text="${player.teamName}">Takım</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <div class="admin-scorer-goals" th:text="${player.goals}">0</div>
+                    <div style="font-size:.7rem;color:var(--text-muted);">gol</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' | TactiCore Admin' : 'TactiCore Admin'}">TactiCore Admin</title>
+    <link rel="icon" href="data:,">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+    <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+
+<div class="admin-wrapper">
+
+    <!-- ── Sol Sidebar ──────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <div class="admin-sidebar__logo">
+            <a th:href="@{/}" style="display:flex;align-items:center;gap:.5rem;color:inherit;">
+                <i class="bi bi-shield-fill-check"></i>
+                <span>TactiCore</span>
+            </a>
+            <span class="admin-sidebar__badge">Admin</span>
+        </div>
+
+        <nav class="admin-sidebar__nav">
+
+            <div class="admin-sidebar__section">
+                <span class="admin-sidebar__section-label">Genel</span>
+                <a th:href="@{/admin}"
+                   class="admin-sidebar__link"
+                   th:classappend="${#request.requestURI == '/admin' or #request.requestURI == '/admin/'} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a th:href="@{/fixtures}"
+                   class="admin-sidebar__link"
+                   th:classappend="${#request.requestURI.startsWith('/fixtures')} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-calendar3"></i> Fikstür
+                </a>
+            </div>
+
+            <div class="admin-sidebar__section">
+                <span class="admin-sidebar__section-label">Yönetim</span>
+                <a th:href="@{/admin/teams}"
+                   class="admin-sidebar__link"
+                   th:classappend="${#request.requestURI.startsWith('/admin/teams') and !#request.requestURI.startsWith('/admin/teams/new')} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-shield"></i> Takımlar
+                </a>
+                <a th:href="@{/admin/teams/new}"
+                   class="admin-sidebar__link"
+                   th:classappend="${#request.requestURI.startsWith('/admin/teams/new')} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-plus-circle"></i> Takım Ekle
+                </a>
+                <a th:href="@{/admin/matches}"
+                   class="admin-sidebar__link"
+                   th:classappend="${#request.requestURI.startsWith('/admin/matches')} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-trophy"></i> Maç Yönetimi
+                </a>
+            </div>
+
+        </nav>
+
+    </aside>
+
+    <!-- ── Ana Alan ──────────────────────────────────────────── -->
+    <div class="admin-main">
+
+        <!-- ── Header ────────────────────────────────────────── -->
+        <header class="admin-header">
+            <div class="admin-header__left">
+                <button class="admin-sidebar-toggle" id="adminSidebarToggle" type="button" aria-label="Menü">
+                    <i class="bi bi-list"></i>
+                </button>
+                <span class="admin-header__title" th:text="${pageTitle} ?: 'Admin Panel'">Admin Panel</span>
+            </div>
+            <div class="admin-header__right">
+                <span class="tc-badge badge-live"
+                      th:if="${adminDashboard != null and adminDashboard.liveCount > 0}">
+                    <span class="live-dot"></span>
+                    <span th:text="${adminDashboard.liveCount}">0</span> Canlı
+                </span>
+                <span style="font-size:.82rem;color:var(--text-muted);"
+                      th:if="${adminDashboard != null and adminDashboard.currentWeek > 0}">
+                    <i class="bi bi-flag"></i>
+                    <span th:text="|${adminDashboard.currentWeek}. Hafta|"></span>
+                </span>
+                <a th:href="@{/}" class="tc-btn tc-btn--ghost" style="font-size:.82rem;padding:.3rem .7rem;">
+                    <i class="bi bi-arrow-left"></i> Siteye Dön
+                </a>
+            </div>
+        </header>
+
+        <!-- ── İçerik ─────────────────────────────────────────── -->
+        <div class="admin-content">
+            <div layout:fragment="content">
+                <!-- Sayfa içeriği buraya yerleşir -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script th:src="@{/js/site.js}"></script>
+<script>
+    (function () {
+        var toggle = document.getElementById('adminSidebarToggle');
+        var sidebar = document.getElementById('adminSidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+    })();
+</script>
+
+</body>
+</html>
