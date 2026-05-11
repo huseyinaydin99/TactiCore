@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="tr">
+<head>
+    <title th:text="|TactiCore - Hafta ${resultsViewModel.currentWeek} Sonuçları|">TactiCore - Sonuçlar</title>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="tc-container">
+
+    <!-- ── Sayfa Başlığı ───────────────────────────────────── -->
+    <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+            <div>
+                <p style="font-size:.75rem;font-weight:600;letter-spacing:.08em;color:var(--green);text-transform:uppercase;margin-bottom:.4rem;">
+                    <i class="bi bi-trophy-fill"></i> PREMİER LİG
+                </p>
+                <h1 class="page-header__title">
+                    Hafta <span style="color:var(--green)" th:text="${resultsViewModel.currentWeek}">33</span> Sonuçları
+                </h1>
+                <p class="page-header__subtitle" th:if="${resultsViewModel.summary != null}">
+                    <i class="bi bi-calendar3"></i>
+                    <span th:text="${resultsViewModel.summary.totalMatches}">0</span> Maç
+                </p>
+            </div>
+
+            <!-- Sayaç Badge'leri + Hafta Navigasyonu -->
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.75rem;">
+                <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end;">
+                    <span class="tc-badge badge-live"
+                          th:if="${resultsViewModel.summary != null and resultsViewModel.summary.liveCount > 0}">
+                        <i class="bi bi-broadcast"></i>
+                        <span th:text="${resultsViewModel.summary.liveCount}">0</span> Canlı
+                    </span>
+                    <span class="tc-badge badge-finished" th:if="${resultsViewModel.summary != null}">
+                        <i class="bi bi-check-circle"></i>
+                        <span th:text="${resultsViewModel.summary.finishedCount}">0</span> Biten
+                    </span>
+                    <span class="tc-badge badge-upcoming" th:if="${resultsViewModel.summary != null}">
+                        <i class="bi bi-clock"></i>
+                        <span th:text="${resultsViewModel.summary.upcomingCount}">0</span> Yaklaşan
+                    </span>
+                </div>
+                <div class="week-nav">
+                    <a th:href="@{/results(week=${resultsViewModel.previousWeek},tab=${resultsViewModel.activeTab})}"
+                       class="week-nav__btn tc-btn tc-btn--ghost">
+                        <i class="bi bi-chevron-left"></i>
+                        <span th:text="${resultsViewModel.previousWeek}">32</span>. Hafta
+                    </a>
+                    <span class="week-nav__label"
+                          th:text="|${resultsViewModel.currentWeek}. Hafta|">33. Hafta</span>
+                    <a th:href="@{/results(week=${resultsViewModel.nextWeek},tab=${resultsViewModel.activeTab})}"
+                       class="week-nav__btn tc-btn tc-btn--ghost">
+                        <span th:text="${resultsViewModel.nextWeek}">34</span>. Hafta
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Öne Çıkan Maç ──────────────────────────────────── -->
+    <div th:if="${resultsViewModel.featuredMatch != null}" style="margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;">
+            <span class="tc-badge badge-featured"><i class="bi bi-star-fill"></i> ÖNE ÇIKAN MAÇ</span>
+            <span style="font-size:.8rem;color:var(--text-muted);">Haftanın Maçı</span>
+        </div>
+        <div class="match-card"
+             th:style="${resultsViewModel.featuredMatch.status.name() == 'LIVE'}
+                 ? 'background:rgba(255,23,68,.06);border-color:rgba(255,23,68,.3);padding:1.5rem;flex-direction:column;'
+                 : 'background:rgba(57,255,141,.04);border-color:rgba(57,255,141,.15);padding:1.5rem;flex-direction:column;'">
+
+            <div style="display:flex;align-items:center;justify-content:center;gap:2.5rem;width:100%;flex-wrap:wrap;">
+                <!-- Ev sahibi -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;min-width:110px;">
+                    <img th:if="${resultsViewModel.featuredMatch.homeTeamLogoUrl != null}"
+                         th:src="${resultsViewModel.featuredMatch.homeTeamLogoUrl}"
+                         style="width:60px;height:60px;object-fit:contain;"
+                         th:alt="${resultsViewModel.featuredMatch.homeTeamName}">
+                    <span style="font-weight:600;font-size:1rem;text-align:center;"
+                          th:text="${resultsViewModel.featuredMatch.homeTeamName}">Ev Sahibi</span>
+                    <span style="font-size:.7rem;color:var(--text-muted);">EV SAHİBİ</span>
+                </div>
+
+                <!-- Skor -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+                    <div th:if="${resultsViewModel.featuredMatch.status.name() == 'LIVE'}"
+                         style="display:flex;align-items:center;gap:.4rem;color:var(--red);">
+                        <i class="bi bi-broadcast"></i>
+                        <span style="font-weight:700;font-size:.85rem;"
+                              th:text="${resultsViewModel.featuredMatch.minute + &quot;'&quot;}">45'</span>
+                    </div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:2.8rem;font-weight:700;letter-spacing:.05em;"
+                         th:if="${resultsViewModel.featuredMatch.status.name() != 'UPCOMING'}"
+                         th:text="${resultsViewModel.featuredMatch.homeScore + ' - ' + resultsViewModel.featuredMatch.awayScore}">0 - 0</div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;color:var(--text-muted);"
+                         th:if="${resultsViewModel.featuredMatch.status.name() == 'UPCOMING'}">VS</div>
+                    <th:block th:switch="${resultsViewModel.featuredMatch.status.name()}">
+                        <span th:case="'LIVE'"     class="tc-badge badge-live"><i class="bi bi-broadcast"></i> CANLI</span>
+                        <span th:case="'FINISHED'" class="tc-badge badge-finished"><i class="bi bi-check-circle"></i> BİTTİ</span>
+                        <span th:case="'UPCOMING'" class="tc-badge badge-upcoming"><i class="bi bi-clock"></i> YAKLAŞAN</span>
+                    </th:block>
+                </div>
+
+                <!-- Deplasman -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;min-width:110px;">
+                    <img th:if="${resultsViewModel.featuredMatch.awayTeamLogoUrl != null}"
+                         th:src="${resultsViewModel.featuredMatch.awayTeamLogoUrl}"
+                         style="width:60px;height:60px;object-fit:contain;"
+                         th:alt="${resultsViewModel.featuredMatch.awayTeamName}">
+                    <span style="font-weight:600;font-size:1rem;text-align:center;"
+                          th:text="${resultsViewModel.featuredMatch.awayTeamName}">Deplasman</span>
+                    <span style="font-size:.7rem;color:var(--text-muted);">DEPLASMAN</span>
+                </div>
+            </div>
+
+            <!-- Alt Bilgi + Detay Butonu -->
+            <div style="display:flex;gap:1.25rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+                <span style="font-size:.8rem;color:var(--text-muted);"
+                      th:if="${resultsViewModel.featuredMatch.stadium != null}">
+                    <i class="bi bi-geo-alt"></i>
+                    <span th:text="${resultsViewModel.featuredMatch.stadium}"></span>
+                </span>
+                <span style="font-size:.8rem;color:var(--text-muted);"
+                      th:if="${resultsViewModel.featuredMatch.matchDate != null}">
+                    <i class="bi bi-calendar3"></i>
+                    <span th:text="${#temporals.format(resultsViewModel.featuredMatch.matchDate,'dd MMM yyyy HH:mm')}"></span>
+                </span>
+                <a th:href="@{/matches/{id}(id=${resultsViewModel.featuredMatch.id})}"
+                   class="tc-btn tc-btn--primary" style="font-size:.8rem;padding:.4rem .9rem;">
+                    <i class="bi bi-eye"></i> Maç Detayı
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Sekmeler ────────────────────────────────────────── -->
+    <div class="results-tabs">
+        <a th:href="@{/results(week=${resultsViewModel.currentWeek},tab='all')}"
+           th:classappend="${resultsViewModel.activeTab == 'all'} ? ' results-tab--active' : ''"
+           class="results-tab">
+            Tüm Maçlar
+            <span class="results-tab__count"
+                  th:text="${#lists.size(resultsViewModel.allMatches)}">0</span>
+        </a>
+        <a th:href="@{/results(week=${resultsViewModel.currentWeek},tab='live')}"
+           th:classappend="${resultsViewModel.activeTab == 'live'} ? ' results-tab--active' : ''"
+           class="results-tab">
+            <i class="bi bi-broadcast" style="color:var(--red);"></i> Canlı
+            <span class="results-tab__count"
+                  th:text="${#lists.size(resultsViewModel.liveMatches)}">0</span>
+        </a>
+        <a th:href="@{/results(week=${resultsViewModel.currentWeek},tab='finished')}"
+           th:classappend="${resultsViewModel.activeTab == 'finished'} ? ' results-tab--active' : ''"
+           class="results-tab">
+            Tamamlananlar
+            <span class="results-tab__count"
+                  th:text="${#lists.size(resultsViewModel.finishedMatches)}">0</span>
+        </a>
+        <a th:href="@{/results(week=${resultsViewModel.currentWeek},tab='upcoming')}"
+           th:classappend="${resultsViewModel.activeTab == 'upcoming'} ? ' results-tab--active' : ''"
+           class="results-tab">
+            Yaklaşanlar
+            <span class="results-tab__count"
+                  th:text="${#lists.size(resultsViewModel.upcomingMatches)}">0</span>
+        </a>
+    </div>
+
+    <!-- ── Aktif Sekmeye Göre Maç Listesi ─────────────────── -->
+    <th:block th:with="displayMatches=${resultsViewModel.activeTab == 'live' ? resultsViewModel.liveMatches : (resultsViewModel.activeTab == 'finished' ? resultsViewModel.finishedMatches : (resultsViewModel.activeTab == 'upcoming' ? resultsViewModel.upcomingMatches : resultsViewModel.allMatches))}">
+
+        <div class="section-header">
+            <h2 class="section-title">
+                <th:block th:switch="${resultsViewModel.activeTab}">
+                    <span th:case="'live'">Canlı Maçlar</span>
+                    <span th:case="'finished'">Tamamlanan Maçlar</span>
+                    <span th:case="'upcoming'">Yaklaşan Maçlar</span>
+                    <span th:case="*">Tüm Maçlar</span>
+                </th:block>
+            </h2>
+            <span style="font-size:.85rem;color:var(--text-muted);"
+                  th:text="|${#lists.size(displayMatches)} maç|">0 maç</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:.6rem;"
+             th:if="${not #lists.isEmpty(displayMatches)}">
+
+            <div th:each="match : ${displayMatches}" class="match-card">
+
+                <!-- Saat / Dakika -->
+                <div class="match-card__time">
+                    <th:block th:if="${match.status.name() == 'LIVE'}">
+                        <span style="color:var(--red);font-weight:700;"
+                              th:text="${match.minute + &quot;'&quot;}">45'</span>
+                    </th:block>
+                    <th:block th:unless="${match.status.name() == 'LIVE'}">
+                        <span th:text="${match.matchDate != null ? #temporals.format(match.matchDate,'HH:mm') : '--:--'}">20:00</span>
+                    </th:block>
+                </div>
+
+                <!-- Takımlar + Skor -->
+                <div class="match-card__teams">
+                    <div class="match-card__team">
+                        <img th:if="${match.homeTeamLogoUrl != null and !#strings.isEmpty(match.homeTeamLogoUrl)}"
+                             th:src="${match.homeTeamLogoUrl}"
+                             class="match-card__team-logo"
+                             th:alt="${match.homeTeamName}">
+                        <span th:text="${match.homeTeamName}">Ev Sahibi</span>
+                    </div>
+
+                    <div class="match-card__score"
+                         th:with="smod=${match.status.name() == 'LIVE' ? 'live' : (match.status.name() == 'FINISHED' ? 'done' : 'next')}"
+                         th:classappend="${'match-card__score--' + smod}">
+                        <th:block th:if="${match.status.name() != 'UPCOMING'}">
+                            <span th:text="${match.homeScore}">0</span>
+                            <span style="margin:0 .2rem">–</span>
+                            <span th:text="${match.awayScore}">0</span>
+                        </th:block>
+                        <th:block th:if="${match.status.name() == 'UPCOMING'}">
+                            <span>VS</span>
+                        </th:block>
+                    </div>
+
+                    <div class="match-card__team match-card__team--away">
+                        <img th:if="${match.awayTeamLogoUrl != null and !#strings.isEmpty(match.awayTeamLogoUrl)}"
+                             th:src="${match.awayTeamLogoUrl}"
+                             class="match-card__team-logo"
+                             th:alt="${match.awayTeamName}">
+                        <span th:text="${match.awayTeamName}">Deplasman</span>
+                    </div>
+                </div>
+
+                <!-- Durum + Detay -->
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;flex-shrink:0;">
+                    <th:block th:switch="${match.status.name()}">
+                        <span th:case="'LIVE'"     class="tc-badge badge-live"><i class="bi bi-broadcast"></i> CANLI</span>
+                        <span th:case="'FINISHED'" class="tc-badge badge-finished"><i class="bi bi-check-circle"></i> BİTTİ</span>
+                        <span th:case="'UPCOMING'" class="tc-badge badge-upcoming"><i class="bi bi-clock"></i> YAKLAŞAN</span>
+                    </th:block>
+                    <a th:href="@{/matches/{id}(id=${match.id})}"
+                       class="tc-btn tc-btn--ghost"
+                       style="font-size:.75rem;padding:.3rem .7rem;">
+                        <i class="bi bi-eye"></i> Detay
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boş durum -->
+        <div th:if="${#lists.isEmpty(displayMatches)}"
+             style="text-align:center;padding:3rem;color:var(--text-muted);">
+            <i class="bi bi-calendar-x" style="font-size:2.5rem;display:block;margin-bottom:.75rem;"></i>
+            Bu kategoride maç bulunamadı.
+        </div>
+
+    </th:block>
+
+</div>
+</div>
+</body>
+</html>
