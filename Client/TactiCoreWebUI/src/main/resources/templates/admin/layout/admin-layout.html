@@ -49,10 +49,10 @@
                    th:classappend="${#request.requestURI.startsWith('/admin/teams') and !#request.requestURI.startsWith('/admin/teams/new')} ? 'admin-sidebar__link--active' : ''">
                     <i class="bi bi-shield"></i> Takımlar
                 </a>
-                <a th:href="@{/admin/teams/new}"
+                <a th:href="@{/admin/teams/add}"
                    class="admin-sidebar__link"
-                   th:classappend="${#request.requestURI.startsWith('/admin/teams/new')} ? 'admin-sidebar__link--active' : ''">
-                    <i class="bi bi-plus-circle"></i> Takım Ekle
+                   th:classappend="${#request.requestURI.startsWith('/admin/teams/add')} ? 'admin-sidebar__link--active' : ''">
+                    <i class="bi bi-plus-circle"></i> Takim Ekle
                 </a>
                 <a th:href="@{/admin/matches}"
                    class="admin-sidebar__link"

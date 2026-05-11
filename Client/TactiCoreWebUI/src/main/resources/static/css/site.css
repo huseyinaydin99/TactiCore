@@ -1101,3 +1101,151 @@ h1, h2, h3, h4, h5 {
 
     .admin-sidebar.collapsed { left: -240px; width: 240px; }
 }
+
+/* ── 37. Admin Alert ────────────────────────────────────────── */
+.admin-alert {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: .875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    animation: fadeSlideIn .25s forwards;
+}
+
+.admin-alert--success {
+    background: rgba(0,230,118,.12);
+    color: var(--green);
+    border: 1px solid rgba(0,230,118,.25);
+}
+
+.admin-alert--error {
+    background: rgba(255,23,68,.12);
+    color: var(--red);
+    border: 1px solid rgba(255,23,68,.25);
+}
+
+/* ── 38. Admin Form Grid ────────────────────────────────────── */
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .admin-form-grid { grid-template-columns: 1fr; }
+}
+
+/* ── 39. Admin Form Controls ────────────────────────────────── */
+.admin-form-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.admin-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 560px) {
+    .admin-form-row { grid-template-columns: 1fr; }
+}
+
+.admin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    margin-bottom: .15rem;
+}
+
+.admin-form-label {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: .03em;
+}
+
+.admin-form-input {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Barlow', sans-serif;
+    font-size: .9rem;
+    padding: .5rem .75rem;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+    width: 100%;
+}
+
+.admin-form-input:focus {
+    border-color: rgba(0,230,118,.45);
+    box-shadow: 0 0 0 3px rgba(0,230,118,.08);
+}
+
+.admin-form-input::placeholder { color: var(--text-muted); opacity: .6; }
+
+.admin-form-hint {
+    font-size: .78rem;
+    color: var(--text-muted);
+    display: block;
+}
+
+/* ── 40. Admin Toggle Switch ────────────────────────────────── */
+.admin-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .65rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.admin-toggle input[type="checkbox"] { display: none; }
+
+.admin-toggle__track {
+    width: 42px;
+    height: 22px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background .2s, border-color .2s;
+}
+
+.admin-toggle__track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    transition: transform .2s, background .2s;
+}
+
+.admin-toggle input:checked + .admin-toggle__track {
+    background: rgba(0,230,118,.25);
+    border-color: rgba(0,230,118,.4);
+}
+
+.admin-toggle input:checked + .admin-toggle__track::after {
+    transform: translateX(20px);
+    background: var(--green);
+}
+
+.admin-toggle__label {
+    font-size: .9rem;
+    font-weight: 500;
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- ── Flash Mesajlar ───────────────────────────────────── -->
+    <div th:if="${successMessage}" class="admin-alert admin-alert--success">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="admin-alert admin-alert--error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- ── Başlık + Ekle Butonu ──────────────────────────────── -->
+    <div class="section-header" style="margin-bottom:1.25rem;">
+        <div>
+            <h2 class="section-title">Takımlar</h2>
+            <p style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;"
+               th:text="|Toplam ${#lists.size(teams)} takım|">0 takım</p>
+        </div>
+        <a th:href="@{/admin/teams/add}" class="tc-btn tc-btn--primary">
+            <i class="bi bi-plus-circle"></i> Yeni Takım Ekle
+        </a>
+    </div>
+
+    <!-- ── Tablo ─────────────────────────────────────────────── -->
+    <div class="tc-card" style="padding:0;overflow:hidden;">
+
+        <div th:if="${#lists.isEmpty(teams)}"
+             style="text-align:center;padding:3.5rem 1rem;color:var(--text-muted);">
+            <i class="bi bi-shield" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:var(--border);"></i>
+            <p style="margin-bottom:1rem;">Henüz takım eklenmemiş.</p>
+            <a th:href="@{/admin/teams/add}" class="tc-btn tc-btn--primary" style="display:inline-flex;">
+                <i class="bi bi-plus-circle"></i> İlk Takımı Ekle
+            </a>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(teams)}" class="standings-table" id="teamsTable">
+            <thead>
+                <tr>
+                    <th style="width:52px;"></th>
+                    <th>Takım Adı</th>
+                    <th>Kısa Ad</th>
+                    <th>Şehir</th>
+                    <th>Stadyum</th>
+                    <th style="text-align:center;">Durum</th>
+                    <th style="text-align:right;padding-right:1.25rem;">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="team : ${teams}" class="team-row">
+                    <td style="padding-left:1rem;">
+                        <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+                            <img th:if="${team.logoUrl != null and !#strings.isEmpty(team.logoUrl)}"
+                                 th:src="${team.logoUrl}"
+                                 style="width:32px;height:32px;object-fit:contain;"
+                                 th:alt="${team.name}">
+                            <i th:unless="${team.logoUrl != null and !#strings.isEmpty(team.logoUrl)}"
+                               class="bi bi-shield" style="font-size:1.4rem;color:var(--text-muted);"></i>
+                        </div>
+                    </td>
+                    <td style="font-weight:600;" th:text="${team.name}">Takım Adı</td>
+                    <td>
+                        <span class="tc-badge"
+                              style="background:rgba(255,255,255,.06);color:var(--text-muted);border:1px solid var(--border);"
+                              th:text="${team.shortName}">BJK</span>
+                    </td>
+                    <td style="color:var(--text-muted);font-size:.88rem;" th:text="${team.city}">Şehir</td>
+                    <td style="color:var(--text-muted);font-size:.85rem;max-width:180px;
+                                overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                        th:text="${team.stadium}">Stadyum</td>
+                    <td style="text-align:center;">
+                        <span th:if="${team.active}" class="tc-badge badge-finished">
+                            <i class="bi bi-circle-fill" style="font-size:.5rem;"></i> Aktif
+                        </span>
+                        <span th:unless="${team.active}" class="tc-badge"
+                              style="background:rgba(255,255,255,.05);color:var(--text-muted);border:1px solid var(--border);">
+                            Pasif
+                        </span>
+                    </td>
+                    <td style="text-align:right;padding-right:1rem;">
+                        <a th:href="@{/admin/teams/edit/{id}(id=${team.id})}"
+                           class="tc-btn tc-btn--ghost"
+                           style="font-size:.8rem;padding:.3rem .65rem;margin-right:.3rem;">
+                            <i class="bi bi-pencil"></i> Düzenle
+                        </a>
+                        <form th:action="@{/admin/teams/delete/{id}(id=${team.id})}"
+                              method="post" style="display:inline;">
+                            <button type="submit"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="font-size:.8rem;padding:.3rem .65rem;color:var(--red);border-color:rgba(255,23,68,.25);"
+                                    onclick="return confirm('Bu takımı silmek istediginize emin misiniz?')">
+                                <i class="bi bi-trash"></i> Sil
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ── Sayfalama ─────────────────────────────────────────── -->
+    <div id="paginationBar" style="margin-top:1rem;"></div>
+
+    <script>
+        (function () {
+            var PER_PAGE = 10;
+            var rows = Array.from(document.querySelectorAll('#teamsTable tbody tr.team-row'));
+            if (rows.length <= PER_PAGE) return;
+
+            var total = rows.length;
+            var pages = Math.ceil(total / PER_PAGE);
+            var cur   = 1;
+
+            function show(p) {
+                cur = p;
+                rows.forEach(function (r, i) {
+                    r.style.display = (i >= (p - 1) * PER_PAGE && i < p * PER_PAGE) ? '' : 'none';
+                });
+                render();
+            }
+
+            function btn(label, page, active, disabled) {
+                return '<button class="tc-btn ' + (active ? 'tc-btn--primary' : 'tc-btn--ghost') + '"' +
+                    ' style="font-size:.82rem;padding:.3rem .65rem;"' +
+                    (disabled ? ' disabled' : '') +
+                    ' onclick="window._tcPage(' + page + ')">' + label + '</button>';
+            }
+
+            function render() {
+                var html = '<div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">';
+                html += btn('<i class="bi bi-chevron-left"></i>', cur - 1, false, cur === 1);
+                for (var i = 1; i <= pages; i++) html += btn(i, i, i === cur, false);
+                html += btn('<i class="bi bi-chevron-right"></i>', cur + 1, false, cur === pages);
+                html += '<span style="font-size:.8rem;color:var(--text-muted);margin-left:.5rem;">' +
+                    (((cur - 1) * PER_PAGE) + 1) + '-' + Math.min(cur * PER_PAGE, total) + ' / ' + total + '</span>';
+                html += '</div>';
+                document.getElementById('paginationBar').innerHTML = html;
+            }
+
+            window._tcPage = function (p) { if (p >= 1 && p <= pages) show(p); };
+            show(1);
+        })();
+    </script>
+
+</div>
+</body>
+</html>

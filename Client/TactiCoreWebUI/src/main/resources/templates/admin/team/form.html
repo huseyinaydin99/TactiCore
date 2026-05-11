@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- ── Flash Mesajlar ───────────────────────────────────── -->
+    <div th:if="${errorMessage}" class="admin-alert admin-alert--error" style="margin-bottom:1rem;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- ── Breadcrumb ────────────────────────────────────────── -->
+    <div style="margin-bottom:1.25rem;font-size:.85rem;color:var(--text-muted);display:flex;align-items:center;gap:.4rem;">
+        <a th:href="@{/admin/teams}" style="color:var(--text-muted);transition:color .15s;"
+           onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+            <i class="bi bi-shield"></i> Takımlar
+        </a>
+        <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+        <span th:text="${isEdit} ? 'Takimi Duzenle' : 'Yeni Takim Ekle'">Form</span>
+    </div>
+
+    <!-- ── İki Kolon Layout ──────────────────────────────────── -->
+    <div class="admin-form-grid">
+
+        <!-- ── Sol: Form ─────────────────────────────────────── -->
+        <div>
+            <form th:with="formAction=${isEdit} ? '/admin/teams/edit/' + teamId : '/admin/teams/add'"
+                  th:action="@{${formAction}}"
+                  th:object="${teamForm}"
+                  method="post">
+
+                <input th:if="${isEdit}" type="hidden" th:field="*{id}">
+
+                <!-- Temel Bilgiler -->
+                <div class="tc-card" style="margin-bottom:1rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-info-circle"></i> Temel Bilgiler
+                    </h3>
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="name">
+                                Takim Adi <span style="color:var(--red);">*</span>
+                            </label>
+                            <input id="name" class="admin-form-input" type="text"
+                                   th:field="*{name}"
+                                   placeholder="ornek: Besiktas JK"
+                                   oninput="updatePreview()" required>
+                        </div>
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="shortName">
+                                Kisa Ad
+                            </label>
+                            <input id="shortName" class="admin-form-input" type="text"
+                                   th:field="*{shortName}"
+                                   placeholder="ornek: BJK" maxlength="6"
+                                   oninput="updatePreview()">
+                        </div>
+                    </div>
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="city">Sehir</label>
+                            <input id="city" class="admin-form-input" type="text"
+                                   th:field="*{city}"
+                                   placeholder="ornek: Istanbul"
+                                   oninput="updatePreview()">
+                        </div>
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="stadium">Stadyum</label>
+                            <input id="stadium" class="admin-form-input" type="text"
+                                   th:field="*{stadium}"
+                                   placeholder="ornek: Vodafone Park"
+                                   oninput="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo & Görsel -->
+                <div class="tc-card" style="margin-bottom:1rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-image"></i> Logo &amp; Gorsel
+                    </h3>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label" for="logoUrl">Logo URL</label>
+                        <input id="logoUrl" class="admin-form-input" type="text"
+                               th:field="*{logoUrl}"
+                               placeholder="https://example.com/logo.png"
+                               oninput="updateLogo()">
+                        <span class="admin-form-hint">PNG veya SVG format onerilir.</span>
+                    </div>
+                </div>
+
+                <!-- Durum -->
+                <div class="tc-card" style="margin-bottom:1.5rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-toggle-on"></i> Durum
+                    </h3>
+                    <label class="admin-toggle">
+                        <input type="checkbox" th:field="*{active}" id="activeToggle"
+                               onchange="updatePreview()">
+                        <span class="admin-toggle__track"></span>
+                        <span class="admin-toggle__label">Takim Aktif</span>
+                    </label>
+                    <p class="admin-form-hint" style="margin-top:.5rem;">
+                        Pasif takimlar liglerde gorunmez.
+                    </p>
+                </div>
+
+                <!-- Butonlar -->
+                <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+                    <button type="submit" class="tc-btn tc-btn--primary">
+                        <i class="bi bi-check-circle"></i>
+                        <span th:text="${isEdit} ? 'Guncelle' : 'Kaydet'">Kaydet</span>
+                    </button>
+                    <a th:href="@{/admin/teams}" class="tc-btn tc-btn--ghost">
+                        <i class="bi bi-arrow-left"></i> Listeye Don
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- ── Sağ: Canlı Önizleme ────────────────────────────── -->
+        <div>
+            <div class="tc-card" style="position:sticky;top:72px;">
+                <h3 style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+                           color:var(--text-muted);margin-bottom:1rem;">
+                    <i class="bi bi-eye"></i> Canli Onizleme
+                </h3>
+
+                <!-- Önizleme Kartı -->
+                <div style="background:var(--bg-dark);border:1px solid var(--border);
+                            border-radius:var(--radius-md);padding:1.5rem;text-align:center;">
+
+                    <!-- Logo -->
+                    <div style="width:80px;height:80px;margin:0 auto .85rem;border-radius:50%;
+                                background:rgba(255,255,255,.04);border:1px solid var(--border);
+                                display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        <img id="preview-logo" src="" alt="Logo"
+                             style="width:64px;height:64px;object-fit:contain;display:none;">
+                        <i id="preview-logo-ph" class="bi bi-shield"
+                           style="font-size:2.2rem;color:var(--text-muted);"></i>
+                    </div>
+
+                    <!-- İsim -->
+                    <div id="preview-name"
+                         style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;
+                                font-weight:700;margin-bottom:.2rem;">Takim Adi</div>
+                    <div id="preview-shortname"
+                         style="font-size:.78rem;color:var(--text-muted);letter-spacing:.08em;
+                                margin-bottom:.9rem;">KISA AD</div>
+
+                    <!-- Detaylar -->
+                    <div style="display:flex;flex-direction:column;gap:.4rem;text-align:left;
+                                border-top:1px solid var(--border);padding-top:.85rem;">
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.85rem;">
+                            <i class="bi bi-geo-alt" style="color:var(--text-muted);width:14px;text-align:center;"></i>
+                            <span id="preview-city" style="color:var(--text-muted);">Sehir</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.85rem;">
+                            <i class="bi bi-building" style="color:var(--text-muted);width:14px;text-align:center;"></i>
+                            <span id="preview-stadium" style="color:var(--text-muted);">Stadyum</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.85rem;margin-top:.15rem;">
+                            <i id="preview-status-icon" class="bi bi-circle-fill"
+                               style="color:var(--green);font-size:.55rem;width:14px;text-align:center;"></i>
+                            <span id="preview-status">Aktif</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat placeholder -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.85rem;">
+                    <div style="background:var(--bg-dark);border:1px solid var(--border);
+                                border-radius:var(--radius-sm);padding:.7rem;text-align:center;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;
+                                    font-weight:700;color:var(--blue);">-</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Maclar</div>
+                    </div>
+                    <div style="background:var(--bg-dark);border:1px solid var(--border);
+                                border-radius:var(--radius-sm);padding:.7rem;text-align:center;">
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;
+                                    font-weight:700;color:var(--green);">-</div>
+                        <div style="font-size:.7rem;color:var(--text-muted);">Puan</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function updatePreview() {
+            var name    = document.getElementById('name')?.value || 'Takim Adi';
+            var short   = (document.getElementById('shortName')?.value || 'KISA AD').toUpperCase();
+            var city    = document.getElementById('city')?.value    || 'Sehir';
+            var stadium = document.getElementById('stadium')?.value || 'Stadyum';
+            var active  = document.getElementById('activeToggle')?.checked ?? true;
+
+            document.getElementById('preview-name').textContent     = name;
+            document.getElementById('preview-shortname').textContent = short;
+            document.getElementById('preview-city').textContent      = city;
+            document.getElementById('preview-stadium').textContent   = stadium;
+            document.getElementById('preview-status').textContent    = active ? 'Aktif' : 'Pasif';
+            document.getElementById('preview-status-icon').style.color = active ? 'var(--green)' : 'var(--text-muted)';
+        }
+
+        function updateLogo() {
+            var url = document.getElementById('logoUrl')?.value;
+            var img = document.getElementById('preview-logo');
+            var ph  = document.getElementById('preview-logo-ph');
+            if (url) {
+                img.src = url;
+                img.style.display = 'block';
+                if (ph) ph.style.display = 'none';
+            } else {
+                img.style.display = 'none';
+                if (ph) ph.style.display = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updatePreview();
+            updateLogo();
+        });
+    </script>
+
+</div>
+</body>
+</html>
