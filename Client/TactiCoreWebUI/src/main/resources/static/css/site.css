@@ -675,3 +675,162 @@ h1, h2, h3, h4, h5 {
     background: rgba(0,230,118,.15);
     color: var(--green);
 }
+
+/* ── 22. Live Dot Animation ─────────────────────────────────── */
+.live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: live-dot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes live-dot-pulse {
+    0%, 100% { opacity: 1;  transform: scale(1);    }
+    50%       { opacity: .3; transform: scale(.65);  }
+}
+
+.tc-navbar__link--live { color: var(--red) !important; }
+.tc-navbar__link--live:hover { color: var(--red) !important; background: rgba(255,23,68,.08) !important; }
+
+/* ── 23. Live Page Layout ───────────────────────────────────── */
+.live-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+/* ── 24. Live Sidebar ───────────────────────────────────────── */
+.live-sidebar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: sticky;
+    top: 72px;
+}
+
+.live-sidebar__header {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.live-match-card {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    padding: .85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    border-left: 3px solid transparent;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.live-match-card:last-child { border-bottom: none; }
+
+.live-match-card:hover        { background: var(--bg-card-hover); }
+.live-match-card--active      { background: var(--bg-card-hover); border-left-color: var(--red); }
+
+.live-match-card__minute {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--red);
+}
+
+.live-match-card__teams { display: flex; flex-direction: column; gap: .3rem; }
+
+.live-match-card__team {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.live-match-card__team-name {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    font-size: .875rem;
+    font-weight: 500;
+    overflow: hidden;
+}
+
+.live-match-card__team-name span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.live-match-card__score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+/* ── 25. Events Tabs (Live Page) ────────────────────────────── */
+.events-tabs {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.events-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .4rem .9rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: .85rem;
+    font-weight: 500;
+    font-family: 'Barlow', sans-serif;
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.events-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,.05);
+}
+
+.events-tab--active {
+    color: var(--text-primary);
+    background: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.2);
+}
+
+/* ── 26. Responsive: Live Page ──────────────────────────────── */
+@media (max-width: 860px) {
+    .live-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .live-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .live-sidebar__header {
+        grid-column: 1 / -1;
+    }
+}
