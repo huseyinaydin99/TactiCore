@@ -1,5 +1,6 @@
 package tr.com.huseyinaydin.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,14 +15,20 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class AppConfig {
+
+    private final JwtClientInterceptor jwtInterceptor;
 
     @Bean
     @Profile("!dev")
     public RestTemplate restTemplate() {
-        return new RestTemplate();
+        RestTemplate rt = new RestTemplate();
+        rt.setInterceptors(List.of(jwtInterceptor));
+        return rt;
     }
 
     // Self-signed sertifika sorununu bypass eder; yalnızca dev profilinde aktiftir.
@@ -54,9 +61,13 @@ public class AppConfig {
                 }
             };
 
-            return new RestTemplate(factory);
+            RestTemplate rt = new RestTemplate(factory);
+            rt.setInterceptors(List.of(jwtInterceptor));
+            return rt;
         } catch (Exception e) {
-            return new RestTemplate();
+            RestTemplate rt = new RestTemplate();
+            rt.setInterceptors(List.of(jwtInterceptor));
+            return rt;
         }
     }
 }

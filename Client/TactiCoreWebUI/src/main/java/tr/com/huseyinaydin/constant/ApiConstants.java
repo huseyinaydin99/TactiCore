@@ -40,4 +40,8 @@ public final class ApiConstants {
     public static final String MATCH_EVENT_GET_BY_ID = "/api/matchevent/GetMatchEvent";
     public static final String MATCH_EVENT_BY_MATCH  = "/api/matchevent/GetByMatchId";
     public static final String DASHBOARD_SUMMARY     = "/api/matchevent/GetDashboardSummary";
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    public static final String AUTH_LOGIN    = "/api/auth/login";
+    public static final String AUTH_REGISTER = "/api/auth/register";
 }

@@ -1,25 +1,32 @@
 package tr.com.huseyinaydin.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import tr.com.huseyinaydin.constant.ApiConstants;
+
+import java.util.Map;
 
 @Controller
 public class AuthController {
 
     @Autowired
-    private InMemoryUserDetailsManager userDetailsManager;
+    private RestTemplate restTemplate;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ObjectMapper objectMapper;
+
+    @Value("${api.base-url}")
+    private String baseUrl;
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error,
@@ -35,7 +42,7 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String registerPage(Model model) {
+    public String registerPage() {
         return "auth/register";
     }
 
@@ -60,21 +67,33 @@ public class AuthController {
             ra.addFlashAttribute("errorMessage", "Sifre en az 6 karakter olmalidir.");
             return "redirect:/register";
         }
+
         try {
-            if (userDetailsManager.userExists(username)) {
-                ra.addFlashAttribute("errorMessage", "Bu kullanici adi zaten kullaniliyor.");
+            Map<String, String> body = Map.of(
+                    "username", username,
+                    "password", password,
+                    "confirmPassword", confirmPassword
+            );
+            String json = restTemplate.postForObject(baseUrl + ApiConstants.AUTH_REGISTER, body, String.class);
+            JsonNode root = objectMapper.readTree(json);
+            if (!root.path("success").asBoolean(false)) {
+                ra.addFlashAttribute("errorMessage", root.path("message").asText("Kayit basarisiz"));
                 return "redirect:/register";
             }
-            UserDetails user = User.builder()
-                    .username(username)
-                    .password(passwordEncoder.encode(password))
-                    .roles("ADMIN")
-                    .build();
-            userDetailsManager.createUser(user);
             ra.addFlashAttribute("successMessage", "Kayit basarili! Giris yapabilirsiniz.");
-        } catch (Exception ex) {
-            ra.addFlashAttribute("errorMessage", "Kayit sirasinda hata olustu: " + ex.getMessage());
+        } catch (HttpClientErrorException e) {
+            try {
+                JsonNode root = objectMapper.readTree(e.getResponseBodyAsString());
+                ra.addFlashAttribute("errorMessage", root.path("message").asText("Kayit basarisiz"));
+            } catch (Exception ignored) {
+                ra.addFlashAttribute("errorMessage", "Kayit sirasinda hata olustu.");
+            }
+            return "redirect:/register";
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Sunucuya erisilemedi. Lutfen daha sonra tekrar deneyin.");
+            return "redirect:/register";
         }
+
         return "redirect:/login";
     }
 }
