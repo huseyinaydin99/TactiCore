@@ -27,6 +27,10 @@ Bu gereksinimler bir arada ele alındığında, hem backend hem frontend'in ayr�
 
 ## 📸 Tanıtım Görselleri:
 
+![19](ekran_goruntuleri/19.png)
+
+![20](ekran_goruntuleri/20.png)
+
 ![1](ekran_goruntuleri/1.png)
 
 ![2](ekran_goruntuleri/2.png)
@@ -60,6 +64,36 @@ Bu gereksinimler bir arada ele alındığında, hem backend hem frontend'in ayr�
 ![16](ekran_goruntuleri/16.png)
 
 ![17](ekran_goruntuleri/17.png)
+
+![18](ekran_goruntuleri/18.png)
+
+![21](ekran_goruntuleri/21.png)
+
+![22](ekran_goruntuleri/22.png)
+
+![23](ekran_goruntuleri/23.png)
+
+![24](ekran_goruntuleri/24.png)
+
+![25](ekran_goruntuleri/25.png)
+
+![26](ekran_goruntuleri/26.png)
+
+![27](ekran_goruntuleri/27.png)
+
+![28](ekran_goruntuleri/28.png)
+
+![29](ekran_goruntuleri/29.png)
+
+![30](ekran_goruntuleri/30.png)
+
+![13](ekran_goruntuleri/31.png)
+
+![32](ekran_goruntuleri/32.png)
+
+![33](ekran_goruntuleri/33.png)
+
+![34](ekran_goruntuleri/34.png)
 
 ## 🏛️ Mimari Genel Bakış
 

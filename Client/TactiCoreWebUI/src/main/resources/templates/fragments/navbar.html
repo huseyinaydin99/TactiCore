@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="tr">
 <body>
 <nav th:fragment="navbar" class="tc-navbar" id="mainNavbar">
     <div class="tc-navbar__container">
@@ -20,6 +22,28 @@
             <li><a th:href="@{/live}"     class="tc-navbar__link tc-navbar__link--live"><span class="live-dot"></span><i class="bi bi-broadcast"></i> Canlı Skorlar</a></li>
             <li><a th:href="@{/matches}"  class="tc-navbar__link"><i class="bi bi-trophy"></i> Maçlar</a></li>
             <li><a th:href="@{/teams}"    class="tc-navbar__link"><i class="bi bi-bar-chart-line"></i> Takımlar</a></li>
+
+            <!-- Giriş yapmamış kullanıcılar -->
+            <li sec:authorize="isAnonymous()" class="tc-navbar__auth-group">
+                <a th:href="@{/login}"    class="tc-navbar__auth-btn tc-navbar__auth-btn--outline">
+                    <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
+                </a>
+                <a th:href="@{/register}" class="tc-navbar__auth-btn tc-navbar__auth-btn--solid">
+                    <i class="bi bi-person-plus-fill"></i> Kayıt Ol
+                </a>
+            </li>
+
+            <!-- Giriş yapmış kullanıcılar -->
+            <li sec:authorize="isAuthenticated()" class="tc-navbar__auth-group">
+                <a th:href="@{/admin}" class="tc-navbar__auth-btn tc-navbar__auth-btn--outline">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Admin
+                </a>
+                <form th:action="@{/logout}" method="post" class="tc-navbar__logout-form">
+                    <button type="submit" class="tc-navbar__auth-btn tc-navbar__auth-btn--danger">
+                        <i class="bi bi-box-arrow-right"></i> Çıkış
+                    </button>
+                </form>
+            </li>
         </ul>
 
     </div>
