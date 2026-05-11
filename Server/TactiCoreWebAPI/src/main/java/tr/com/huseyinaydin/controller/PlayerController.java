@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tr.com.huseyinaydin.common.ApiResponse;
 import tr.com.huseyinaydin.dto.player.ResultPlayerDto;
@@ -23,5 +24,10 @@ public class PlayerController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ResultPlayerDto>>> getAll() {
         return ResponseEntity.ok(ApiResponse.success(playerService.getAll()));
+    }
+
+    @GetMapping("/GetByTeam")
+    public ResponseEntity<ApiResponse<List<ResultPlayerDto>>> getByTeam(@RequestParam String teamId) {
+        return ResponseEntity.ok(ApiResponse.success(playerService.getByTeam(teamId)));
     }
 }

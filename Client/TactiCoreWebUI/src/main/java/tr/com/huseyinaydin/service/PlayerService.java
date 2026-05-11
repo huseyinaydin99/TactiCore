@@ -7,4 +7,6 @@ import java.util.List;
 public interface PlayerService {
 
     List<ResultPlayerDto> getAll();
+
+    List<ResultPlayerDto> getByTeamId(String teamId);
 }

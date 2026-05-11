@@ -21,7 +21,8 @@ public final class ApiConstants {
     public static final String MATCH_UPCOMING_COUNT = "/api/match/UpcomingCount";
 
     // ── Player ────────────────────────────────────────────────────────────────
-    public static final String PLAYER_BASE = "/api/player";
+    public static final String PLAYER_BASE    = "/api/player";
+    public static final String PLAYER_BY_TEAM = "/api/player/GetByTeam";
 
     // ── Standing ──────────────────────────────────────────────────────────────
     public static final String STANDING_BASE      = "/api/standing";

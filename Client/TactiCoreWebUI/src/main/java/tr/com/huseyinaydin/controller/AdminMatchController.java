@@ -9,7 +9,11 @@ import tr.com.huseyinaydin.dto.match.CreateMatchDto;
 import tr.com.huseyinaydin.dto.match.GetMatchByIdDto;
 import tr.com.huseyinaydin.dto.match.ResultMatchDto;
 import tr.com.huseyinaydin.dto.match.UpdateMatchDto;
+import tr.com.huseyinaydin.dto.matchevent.CreateMatchEventDto;
+import tr.com.huseyinaydin.dto.matchevent.ResultMatchEventDto;
+import tr.com.huseyinaydin.dto.player.ResultPlayerDto;
 import tr.com.huseyinaydin.dto.team.ResultTeamDto;
+import tr.com.huseyinaydin.model.MatchEventsViewModel;
 
 import java.beans.PropertyEditorSupport;
 import java.time.LocalDateTime;
@@ -137,6 +141,51 @@ public class AdminMatchController extends AbstractBaseController {
             ra.addFlashAttribute("errorMessage", "Silme islemi basarisiz: " + ex.getMessage());
         }
         return "redirect:/admin/matches";
+    }
+
+    @GetMapping("/{id}/events")
+    public String events(@PathVariable String id, Model model) {
+        try {
+            addCommonAttributes(model);
+            GetMatchByIdDto match = serviceFactory.getMatchService().getById(id);
+            List<ResultMatchEventDto> events = serviceFactory.getMatchEventService().getByMatchId(id);
+            List<ResultPlayerDto> players = serviceFactory.getPlayerService().getAll();
+            if (events == null) events = Collections.emptyList();
+            if (players == null) players = Collections.emptyList();
+            model.addAttribute("matchVm", new MatchEventsViewModel(match, events, players));
+            model.addAttribute("eventForm", new CreateMatchEventDto());
+            model.addAttribute("pageTitle", "Mac Olaylari");
+            return "admin/match/events";
+        } catch (Exception ex) {
+            return handleError(model, ex, "admin/match/events");
+        }
+    }
+
+    @PostMapping("/{id}/events/add")
+    public String addEvent(@PathVariable String id,
+                           @ModelAttribute("eventForm") CreateMatchEventDto dto,
+                           RedirectAttributes ra) {
+        try {
+            dto.setMatchId(id);
+            serviceFactory.getMatchEventService().create(dto);
+            ra.addFlashAttribute("successMessage", "Olay basariyla eklendi.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("errorMessage", "Olay eklenirken hata olustu: " + ex.getMessage());
+        }
+        return "redirect:/admin/matches/" + id + "/events";
+    }
+
+    @PostMapping("/{id}/events/delete/{eventId}")
+    public String deleteEvent(@PathVariable String id,
+                              @PathVariable String eventId,
+                              RedirectAttributes ra) {
+        try {
+            serviceFactory.getMatchEventService().delete(eventId);
+            ra.addFlashAttribute("successMessage", "Olay basariyla silindi.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("errorMessage", "Silme islemi basarisiz: " + ex.getMessage());
+        }
+        return "redirect:/admin/matches/" + id + "/events";
     }
 
     private List<ResultTeamDto> getTeams() {

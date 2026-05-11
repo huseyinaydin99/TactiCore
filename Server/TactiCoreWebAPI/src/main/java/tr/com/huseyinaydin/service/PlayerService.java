@@ -9,4 +9,6 @@ public interface PlayerService {
     List<ResultPlayerDto> getAll();
 
     ResultPlayerDto getById(String id);
+
+    List<ResultPlayerDto> getByTeam(String teamId);
 }

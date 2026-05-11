@@ -160,6 +160,11 @@
 
                     <!-- Islemler -->
                     <td style="text-align:right;padding-right:1rem;">
+                        <a th:href="@{/admin/matches/{id}/events(id=${match.id})}"
+                           class="tc-btn tc-btn--ghost"
+                           style="font-size:.8rem;padding:.3rem .65rem;margin-right:.3rem;color:var(--blue);border-color:rgba(41,121,255,.25);">
+                            <i class="bi bi-list-ul"></i> Olaylar
+                        </a>
                         <a th:href="@{/admin/matches/edit/{id}(id=${match.id})}"
                            class="tc-btn tc-btn--ghost"
                            style="font-size:.8rem;padding:.3rem .65rem;margin-right:.3rem;">

@@ -26,4 +26,10 @@ public class PlayerServiceImpl extends AbstractApiService<ResultPlayerDto> imple
         return getForList(buildUrl(ApiConstants.PLAYER_BASE),
                 new ParameterizedTypeReference<>() {});
     }
+
+    @Override
+    public List<ResultPlayerDto> getByTeamId(String teamId) {
+        return getForList(buildUrl(ApiConstants.PLAYER_BY_TEAM + "?teamId=%s", teamId),
+                new ParameterizedTypeReference<>() {});
+    }
 }

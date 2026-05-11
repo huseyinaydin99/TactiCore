@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Flash Mesajlar -->
+    <div th:if="${successMessage}" class="admin-alert admin-alert--success" style="margin-bottom:1rem;">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="admin-alert admin-alert--error" style="margin-bottom:1rem;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Mac Baslik Karti -->
+    <div class="tc-card" style="margin-bottom:1.25rem;padding:1rem 1.25rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+
+            <!-- Sol: Mac bilgisi -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <!-- Ev Sahibi -->
+                <div style="display:flex;align-items:center;gap:.5rem;">
+                    <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <img th:if="${matchVm.match.homeTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.homeTeamLogoUrl)}"
+                             th:src="${matchVm.match.homeTeamLogoUrl}"
+                             style="width:30px;height:30px;object-fit:contain;"
+                             th:alt="${matchVm.match.homeTeamName}">
+                        <i th:unless="${matchVm.match.homeTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.homeTeamLogoUrl)}"
+                           class="bi bi-shield" style="font-size:1.3rem;color:var(--text-muted);"></i>
+                    </div>
+                    <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;"
+                          th:text="${matchVm.match.homeTeamName}">Ev Sahibi</span>
+                </div>
+
+                <!-- Skor -->
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:700;
+                            letter-spacing:.06em;padding:0 .5rem;">
+                    <span th:text="${matchVm.match.homeScore}">0</span>
+                    <span style="color:var(--text-muted);margin:0 .2rem;">-</span>
+                    <span th:text="${matchVm.match.awayScore}">0</span>
+                </div>
+
+                <!-- Deplasman -->
+                <div style="display:flex;align-items:center;gap:.5rem;">
+                    <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;"
+                          th:text="${matchVm.match.awayTeamName}">Deplasman</span>
+                    <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <img th:if="${matchVm.match.awayTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.awayTeamLogoUrl)}"
+                             th:src="${matchVm.match.awayTeamLogoUrl}"
+                             style="width:30px;height:30px;object-fit:contain;"
+                             th:alt="${matchVm.match.awayTeamName}">
+                        <i th:unless="${matchVm.match.awayTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.awayTeamLogoUrl)}"
+                           class="bi bi-shield" style="font-size:1.3rem;color:var(--text-muted);"></i>
+                    </div>
+                </div>
+
+                <!-- Durum Badge -->
+                <span th:if="${matchVm.match.status.name() == 'LIVE'}" class="tc-badge badge-live">
+                    <span class="live-dot"></span> Canli
+                </span>
+                <span th:if="${matchVm.match.status.name() == 'FINISHED'}" class="tc-badge badge-finished">Bitti</span>
+                <span th:if="${matchVm.match.status.name() == 'UPCOMING'}" class="tc-badge badge-upcoming">Yaklasan</span>
+            </div>
+
+            <!-- Sag: Butonlar -->
+            <a th:href="@{/admin/matches}" class="tc-btn tc-btn--ghost" style="font-size:.82rem;padding:.3rem .7rem;">
+                <i class="bi bi-arrow-left"></i> Listeye Don
+            </a>
+        </div>
+    </div>
+
+    <!-- Sekmeler -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem;">
+        <a th:with="editHref='/admin/matches/edit/' + matchVm.match.id"
+           th:href="@{${editHref}}"
+           style="padding:.6rem 1.1rem;font-size:.88rem;color:var(--text-muted);text-decoration:none;
+                  border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:.35rem;
+                  transition:color .15s;"
+           onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+            <i class="bi bi-pencil"></i> Mac Duzenle
+        </a>
+        <span style="padding:.6rem 1.1rem;font-size:.88rem;color:var(--text-primary);
+                     border-bottom:2px solid var(--blue);margin-bottom:-1px;
+                     display:inline-flex;align-items:center;gap:.35rem;cursor:default;">
+            <i class="bi bi-list-ul"></i>
+            Mac Olaylari (<span th:text="${#lists.size(matchVm.events)}">0</span>)
+        </span>
+    </div>
+
+    <!-- Ozet Sayaclar -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;">
+        <div class="tc-card" style="text-align:center;padding:.9rem .5rem;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:700;color:var(--green);"
+                 th:text="${matchVm.goalCount}">0</div>
+            <div style="font-size:.72rem;color:var(--text-muted);letter-spacing:.05em;margin-top:.1rem;">GOL</div>
+        </div>
+        <div class="tc-card" style="text-align:center;padding:.9rem .5rem;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:700;color:var(--gold);"
+                 th:text="${matchVm.yellowCardCount}">0</div>
+            <div style="font-size:.72rem;color:var(--text-muted);letter-spacing:.05em;margin-top:.1rem;">SARI KART</div>
+        </div>
+        <div class="tc-card" style="text-align:center;padding:.9rem .5rem;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:700;color:var(--red);"
+                 th:text="${matchVm.redCardCount}">0</div>
+            <div style="font-size:.72rem;color:var(--text-muted);letter-spacing:.05em;margin-top:.1rem;">KIRMIZI KART</div>
+        </div>
+        <div class="tc-card" style="text-align:center;padding:.9rem .5rem;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:700;color:var(--blue);"
+                 th:text="${matchVm.substitutionCount}">0</div>
+            <div style="font-size:.72rem;color:var(--text-muted);letter-spacing:.05em;margin-top:.1rem;">DEGISIKLIK</div>
+        </div>
+    </div>
+
+    <!-- Iki Kolon: Form Sol, Liste Sag -->
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:1.25rem;align-items:start;">
+
+        <!-- Sol: Yeni Olay Ekle Formu -->
+        <div>
+            <div class="tc-card">
+                <h3 class="admin-form-section-title" style="margin-bottom:1rem;">
+                    <i class="bi bi-plus-circle"></i> Yeni Olay Ekle
+                </h3>
+
+                <form th:with="addAction='/admin/matches/' + matchVm.match.id + '/events/add'"
+                      th:action="@{${addAction}}"
+                      th:object="${eventForm}"
+                      method="post">
+
+                    <!-- Olay Turu Seçici -->
+                    <div class="admin-form-group" style="margin-bottom:1rem;">
+                        <label class="admin-form-label">Olay Turu <span style="color:var(--red);">*</span></label>
+                        <input type="hidden" id="eventTypeInput" name="eventType" value="GOAL">
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;">
+                            <button type="button" id="et-GOAL" onclick="setEventType('GOAL')"
+                                    class="tc-btn tc-btn--primary"
+                                    style="flex-direction:column;gap:.25rem;padding:.75rem .4rem;height:auto;justify-content:center;">
+                                <i class="bi bi-dribbble" style="font-size:1.25rem;color:var(--green);"></i>
+                                <span style="font-size:.78rem;">Gol</span>
+                            </button>
+                            <button type="button" id="et-YELLOW_CARD" onclick="setEventType('YELLOW_CARD')"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="flex-direction:column;gap:.25rem;padding:.75rem .4rem;height:auto;justify-content:center;">
+                                <i class="bi bi-square-fill" style="font-size:1.1rem;color:var(--gold);"></i>
+                                <span style="font-size:.78rem;">Sari Kart</span>
+                            </button>
+                            <button type="button" id="et-RED_CARD" onclick="setEventType('RED_CARD')"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="flex-direction:column;gap:.25rem;padding:.75rem .4rem;height:auto;justify-content:center;">
+                                <i class="bi bi-square-fill" style="font-size:1.1rem;color:var(--red);"></i>
+                                <span style="font-size:.78rem;">Kirmizi Kart</span>
+                            </button>
+                            <button type="button" id="et-SUBSTITUTION" onclick="setEventType('SUBSTITUTION')"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="flex-direction:column;gap:.25rem;padding:.75rem .4rem;height:auto;justify-content:center;">
+                                <i class="bi bi-arrow-left-right" style="font-size:1.1rem;color:var(--blue);"></i>
+                                <span style="font-size:.78rem;">Degisiklik</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Takim Seçici -->
+                    <div class="admin-form-group" style="margin-bottom:1rem;">
+                        <label class="admin-form-label">Takim <span style="color:var(--red);">*</span></label>
+                        <input type="hidden" id="teamIdInput" name="teamId" th:value="${matchVm.match.homeTeamId}">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+                            <button type="button" id="team-HOME" onclick="setTeam('home')"
+                                    class="tc-btn tc-btn--primary"
+                                    style="flex-direction:column;gap:.3rem;padding:.75rem .4rem;height:auto;justify-content:center;overflow:hidden;">
+                                <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+                                    <img th:if="${matchVm.match.homeTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.homeTeamLogoUrl)}"
+                                         th:src="${matchVm.match.homeTeamLogoUrl}"
+                                         style="width:24px;height:24px;object-fit:contain;"
+                                         th:alt="${matchVm.match.homeTeamName}">
+                                    <i th:unless="${matchVm.match.homeTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.homeTeamLogoUrl)}"
+                                       class="bi bi-shield" style="font-size:1rem;color:var(--text-muted);"></i>
+                                </div>
+                                <span style="font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;"
+                                      th:text="${matchVm.match.homeTeamName}">Ev Sahibi</span>
+                            </button>
+                            <button type="button" id="team-AWAY" onclick="setTeam('away')"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="flex-direction:column;gap:.3rem;padding:.75rem .4rem;height:auto;justify-content:center;overflow:hidden;">
+                                <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+                                    <img th:if="${matchVm.match.awayTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.awayTeamLogoUrl)}"
+                                         th:src="${matchVm.match.awayTeamLogoUrl}"
+                                         style="width:24px;height:24px;object-fit:contain;"
+                                         th:alt="${matchVm.match.awayTeamName}">
+                                    <i th:unless="${matchVm.match.awayTeamLogoUrl != null and !#strings.isEmpty(matchVm.match.awayTeamLogoUrl)}"
+                                       class="bi bi-shield" style="font-size:1rem;color:var(--text-muted);"></i>
+                                </div>
+                                <span style="font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;"
+                                      th:text="${matchVm.match.awayTeamName}">Deplasman</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Oyuncu Dropdown -->
+                    <div class="admin-form-group" style="margin-bottom:.85rem;">
+                        <label class="admin-form-label" for="playerId">Oyuncu</label>
+                        <select id="playerId" name="playerId" class="admin-form-input">
+                            <option value="">-- Oyuncu Secin --</option>
+                        </select>
+                    </div>
+
+                    <!-- Dakika -->
+                    <div class="admin-form-group" style="margin-bottom:.85rem;">
+                        <label class="admin-form-label" for="minute">Dakika <span style="color:var(--red);">*</span></label>
+                        <input type="number" id="minute" class="admin-form-input"
+                               th:field="*{minute}" min="0" max="120" style="max-width:120px;">
+                    </div>
+
+                    <!-- Aciklama -->
+                    <div class="admin-form-group" style="margin-bottom:1.1rem;">
+                        <label class="admin-form-label" for="description">Aciklama</label>
+                        <input type="text" id="description" class="admin-form-input"
+                               th:field="*{description}"
+                               placeholder="ornek: Kafa vurusu, penalti...">
+                    </div>
+
+                    <button type="submit" class="tc-btn tc-btn--primary" style="width:100%;justify-content:center;">
+                        <i class="bi bi-plus-circle"></i> Olay Ekle
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Sag: Mevcut Olaylar Listesi -->
+        <div>
+            <div class="tc-card" style="padding:0;overflow:hidden;">
+
+                <div style="padding:.9rem 1.1rem;border-bottom:1px solid var(--border);">
+                    <h3 style="font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+                               color:var(--text-muted);margin:0;">
+                        <i class="bi bi-clock-history"></i> Olay Akisi
+                    </h3>
+                </div>
+
+                <div th:if="${#lists.isEmpty(matchVm.events)}"
+                     style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">
+                    <i class="bi bi-clipboard-x" style="font-size:2rem;display:block;margin-bottom:.6rem;color:var(--border);"></i>
+                    <p style="font-size:.88rem;">Henuz olay eklenmemis.</p>
+                </div>
+
+                <table th:unless="${#lists.isEmpty(matchVm.events)}" class="standings-table">
+                    <thead>
+                        <tr>
+                            <th style="width:55px;text-align:center;">Dk</th>
+                            <th style="width:36px;"></th>
+                            <th>Oyuncu</th>
+                            <th>Takim</th>
+                            <th>Aciklama</th>
+                            <th style="text-align:right;padding-right:1rem;width:56px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="event : ${matchVm.events}">
+
+                            <!-- Dakika -->
+                            <td style="text-align:center;">
+                                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;
+                                             font-size:.95rem;color:var(--text-primary);">
+                                    <span th:text="${event.minute}">0</span>'
+                                </span>
+                            </td>
+
+                            <!-- Ikon -->
+                            <td style="text-align:center;">
+                                <i th:if="${event.eventType.name() == 'GOAL'}"
+                                   class="bi bi-dribbble" style="color:var(--green);font-size:1.1rem;"></i>
+                                <i th:if="${event.eventType.name() == 'YELLOW_CARD'}"
+                                   class="bi bi-square-fill" style="color:var(--gold);font-size:.95rem;"></i>
+                                <i th:if="${event.eventType.name() == 'RED_CARD'}"
+                                   class="bi bi-square-fill" style="color:var(--red);font-size:.95rem;"></i>
+                                <i th:if="${event.eventType.name() == 'SUBSTITUTION'}"
+                                   class="bi bi-arrow-left-right" style="color:var(--blue);font-size:.95rem;"></i>
+                            </td>
+
+                            <!-- Oyuncu -->
+                            <td>
+                                <span style="font-weight:600;font-size:.88rem;"
+                                      th:text="${event.playerName != null and !#strings.isEmpty(event.playerName)} ? event.playerName : '-'">
+                                    Oyuncu
+                                </span>
+                            </td>
+
+                            <!-- Takim Badge -->
+                            <td>
+                                <span th:if="${event.teamId == matchVm.match.homeTeamId}"
+                                      class="tc-badge"
+                                      style="background:rgba(41,121,255,.12);color:var(--blue);border-color:rgba(41,121,255,.25);font-size:.72rem;"
+                                      th:text="${event.teamName}">Takim</span>
+                                <span th:if="${event.teamId == matchVm.match.awayTeamId}"
+                                      class="tc-badge"
+                                      style="background:rgba(156,39,176,.12);color:#ce93d8;border-color:rgba(156,39,176,.25);font-size:.72rem;"
+                                      th:text="${event.teamName}">Takim</span>
+                                <span th:if="${event.teamId != matchVm.match.homeTeamId and event.teamId != matchVm.match.awayTeamId}"
+                                      class="tc-badge" style="font-size:.72rem;"
+                                      th:text="${event.teamName}">Takim</span>
+                            </td>
+
+                            <!-- Aciklama -->
+                            <td style="color:var(--text-muted);font-size:.82rem;max-width:140px;
+                                       overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                                th:text="${event.description != null ? event.description : ''}">
+                            </td>
+
+                            <!-- Sil -->
+                            <td style="text-align:right;padding-right:.75rem;">
+                                <form th:with="delAction='/admin/matches/' + matchVm.match.id + '/events/delete/' + event.id"
+                                      th:action="@{${delAction}}"
+                                      method="post" style="display:inline;">
+                                    <button type="submit"
+                                            class="tc-btn tc-btn--ghost"
+                                            style="font-size:.75rem;padding:.25rem .5rem;color:var(--red);border-color:rgba(255,23,68,.25);"
+                                            onclick="return confirm('Bu olayi silmek istediginize emin misiniz?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        var HOME_TEAM_ID = /*[[${matchVm.match.homeTeamId}]]*/ '';
+        var AWAY_TEAM_ID = /*[[${matchVm.match.awayTeamId}]]*/ '';
+        var ALL_PLAYERS  = /*[[${matchVm.players}]]*/ [];
+
+        var EVENT_TYPES = ['GOAL', 'YELLOW_CARD', 'RED_CARD', 'SUBSTITUTION'];
+
+        function setEventType(et) {
+            document.getElementById('eventTypeInput').value = et;
+            EVENT_TYPES.forEach(function (e) {
+                var btn = document.getElementById('et-' + e);
+                if (!btn) return;
+                btn.classList.remove('tc-btn--primary', 'tc-btn--ghost');
+                btn.classList.add(e === et ? 'tc-btn--primary' : 'tc-btn--ghost');
+            });
+        }
+
+        function setTeam(side) {
+            var teamId = side === 'home' ? HOME_TEAM_ID : AWAY_TEAM_ID;
+            document.getElementById('teamIdInput').value = teamId;
+
+            var homeBtn = document.getElementById('team-HOME');
+            var awayBtn = document.getElementById('team-AWAY');
+            homeBtn.classList.remove('tc-btn--primary', 'tc-btn--ghost');
+            awayBtn.classList.remove('tc-btn--primary', 'tc-btn--ghost');
+            homeBtn.classList.add(side === 'home' ? 'tc-btn--primary' : 'tc-btn--ghost');
+            awayBtn.classList.add(side === 'away' ? 'tc-btn--primary' : 'tc-btn--ghost');
+
+            fillPlayerDropdown(teamId);
+        }
+
+        function fillPlayerDropdown(teamId) {
+            var select = document.getElementById('playerId');
+            select.innerHTML = '<option value="">-- Oyuncu Secin --</option>';
+            ALL_PLAYERS
+                .filter(function (p) { return p.teamId === teamId; })
+                .forEach(function (p) {
+                    var opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.fullName || p.shortName || p.id;
+                    select.appendChild(opt);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fillPlayerDropdown(HOME_TEAM_ID);
+        });
+    </script>
+
+</div>
+</body>
+</html>

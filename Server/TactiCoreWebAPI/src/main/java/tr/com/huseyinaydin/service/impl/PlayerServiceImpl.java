@@ -51,4 +51,17 @@ public class PlayerServiceImpl implements PlayerService {
                 .ifPresent(team -> PlayerEnricher.enrich(dto, team));
         return dto;
     }
+
+    @Override
+    public List<ResultPlayerDto> getByTeam(String teamId) {
+        Team team = teamRepository.findById(teamId).orElse(new Team());
+        return playerRepository.findAll().stream()
+                .filter(p -> teamId.equals(p.getTeamId()))
+                .map(p -> {
+                    ResultPlayerDto dto = playerMapper.toResultDto(p);
+                    PlayerEnricher.enrich(dto, team);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }
