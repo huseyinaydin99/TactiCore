@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Flash -->
+    <div th:if="${errorMessage}" class="admin-alert admin-alert--error" style="margin-bottom:1rem;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div style="margin-bottom:1.25rem;font-size:.85rem;color:var(--text-muted);display:flex;align-items:center;gap:.4rem;">
+        <a th:href="@{/admin/matches}" style="color:var(--text-muted);transition:color .15s;"
+           onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+            <i class="bi bi-trophy"></i> Maclar
+        </a>
+        <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+        <span th:text="${isEdit} ? 'Maci Duzenle' : 'Yeni Mac Ekle'">Form</span>
+    </div>
+
+    <!-- Iki Kolon Layout -->
+    <div class="admin-form-grid">
+
+        <!-- Sol: Form -->
+        <div>
+            <form th:with="formAction=${isEdit} ? '/admin/matches/edit/' + matchId : '/admin/matches/add'"
+                  th:action="@{${formAction}}"
+                  th:object="${matchForm}"
+                  method="post">
+
+                <input th:if="${isEdit}" type="hidden" th:field="*{id}">
+
+                <!-- Takimlar -->
+                <div class="tc-card" style="margin-bottom:1rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-shield-halved"></i> Takimlar
+                    </h3>
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="homeTeamId">
+                                Ev Sahibi <span style="color:var(--red);">*</span>
+                            </label>
+                            <select th:field="*{homeTeamId}" id="homeTeamId" class="admin-form-input" onchange="updatePreview()">
+                                <option value="">-- Takim Secin --</option>
+                                <option th:each="team : ${teams}"
+                                        th:value="${team.id}"
+                                        th:text="${team.name}"
+                                        th:attr="data-logo=${team.logoUrl != null ? team.logoUrl : ''}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="awayTeamId">
+                                Deplasman <span style="color:var(--red);">*</span>
+                            </label>
+                            <select th:field="*{awayTeamId}" id="awayTeamId" class="admin-form-input" onchange="updatePreview()">
+                                <option value="">-- Takim Secin --</option>
+                                <option th:each="team : ${teams}"
+                                        th:value="${team.id}"
+                                        th:text="${team.name}"
+                                        th:attr="data-logo=${team.logoUrl != null ? team.logoUrl : ''}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skor ve Durum -->
+                <div class="tc-card" style="margin-bottom:1rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-123"></i> Skor ve Durum
+                    </h3>
+
+                    <!-- Skor Girisi -->
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+                        <div style="flex:1;">
+                            <label class="admin-form-label" for="homeScore">Ev Sahibi Gol</label>
+                            <input type="number" id="homeScore" class="admin-form-input"
+                                   th:field="*{homeScore}"
+                                   min="0" max="99"
+                                   style="text-align:center;font-size:1.3rem;font-weight:700;"
+                                   oninput="updatePreview()">
+                        </div>
+                        <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;
+                                    color:var(--text-muted);padding-top:1.4rem;">-</div>
+                        <div style="flex:1;">
+                            <label class="admin-form-label" for="awayScore">Deplasman Gol</label>
+                            <input type="number" id="awayScore" class="admin-form-input"
+                                   th:field="*{awayScore}"
+                                   min="0" max="99"
+                                   style="text-align:center;font-size:1.3rem;font-weight:700;"
+                                   oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <!-- Durum Secici -->
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Durum <span style="color:var(--red);">*</span></label>
+                        <input type="hidden" id="statusInput" name="status"
+                               th:value="${matchForm.status != null ? matchForm.status.name() : 'UPCOMING'}">
+                        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                            <button type="button" id="btn-LIVE"
+                                    class="tc-btn"
+                                    th:classappend="${matchForm.status != null and matchForm.status.name() == 'LIVE'} ? 'tc-btn--primary' : 'tc-btn--ghost'"
+                                    onclick="setStatus('LIVE')" style="font-size:.85rem;">
+                                <i class="bi bi-broadcast"></i> Canli
+                            </button>
+                            <button type="button" id="btn-FINISHED"
+                                    class="tc-btn"
+                                    th:classappend="${matchForm.status != null and matchForm.status.name() == 'FINISHED'} ? 'tc-btn--primary' : 'tc-btn--ghost'"
+                                    onclick="setStatus('FINISHED')" style="font-size:.85rem;">
+                                <i class="bi bi-check-circle"></i> Bitti
+                            </button>
+                            <button type="button" id="btn-UPCOMING"
+                                    class="tc-btn"
+                                    th:classappend="${matchForm.status == null or matchForm.status.name() == 'UPCOMING'} ? 'tc-btn--primary' : 'tc-btn--ghost'"
+                                    onclick="setStatus('UPCOMING')" style="font-size:.85rem;">
+                                <i class="bi bi-clock"></i> Yaklasan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dakika (sadece LIVE) -->
+                    <div id="minuteGroup" class="admin-form-group"
+                         th:style="${matchForm.status != null and matchForm.status.name() == 'LIVE'} ? 'margin-top:.75rem;' : 'margin-top:.75rem;display:none;'">
+                        <label class="admin-form-label" for="minute">Dakika</label>
+                        <input type="number" id="minute" class="admin-form-input"
+                               th:field="*{minute}" min="0" max="120" style="max-width:120px;">
+                    </div>
+                </div>
+
+                <!-- Mac Bilgileri -->
+                <div class="tc-card" style="margin-bottom:1rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-calendar3"></i> Mac Bilgileri
+                    </h3>
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="matchDate">
+                                Tarih ve Saat <span style="color:var(--red);">*</span>
+                            </label>
+                            <input type="datetime-local" id="matchDate" name="matchDate"
+                                   class="admin-form-input"
+                                   th:value="${matchForm.matchDate != null ? #temporals.format(matchForm.matchDate, 'yyyy-MM-dd') + 'T' + #temporals.format(matchForm.matchDate, 'HH:mm') : ''}"
+                                   oninput="updatePreview()">
+                        </div>
+                        <div class="admin-form-group">
+                            <label class="admin-form-label" for="week">Hafta</label>
+                            <input type="number" id="week" class="admin-form-input"
+                                   th:field="*{week}" min="1" max="50"
+                                   oninput="updatePreview()">
+                        </div>
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label" for="stadium">Stadyum</label>
+                        <input type="text" id="stadium" class="admin-form-input"
+                               th:field="*{stadium}"
+                               placeholder="ornek: Vodafone Park"
+                               oninput="updatePreview()">
+                    </div>
+                </div>
+
+                <!-- Ozellikler -->
+                <div class="tc-card" style="margin-bottom:1.5rem;">
+                    <h3 class="admin-form-section-title">
+                        <i class="bi bi-star"></i> Ozellikler
+                    </h3>
+                    <label class="admin-toggle">
+                        <input type="checkbox" th:field="*{featured}" id="featuredToggle"
+                               onchange="updatePreview()">
+                        <span class="admin-toggle__track"></span>
+                        <span class="admin-toggle__label">One Cikan Mac</span>
+                    </label>
+                    <p class="admin-form-hint" style="margin-top:.5rem;">
+                        One cikan mac ana sayfada ve fikstürde ozel olarak gosterilir.
+                    </p>
+                </div>
+
+                <!-- Butonlar -->
+                <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+                    <button type="submit" class="tc-btn tc-btn--primary">
+                        <i class="bi bi-check-circle"></i>
+                        <span th:text="${isEdit} ? 'Guncelle' : 'Kaydet'">Kaydet</span>
+                    </button>
+                    <a th:href="@{/admin/matches}" class="tc-btn tc-btn--ghost">
+                        <i class="bi bi-arrow-left"></i> Listeye Don
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Sag: Canli Onizleme -->
+        <div>
+            <div class="tc-card" style="position:sticky;top:72px;">
+                <h3 style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+                           color:var(--text-muted);margin-bottom:1rem;">
+                    <i class="bi bi-eye"></i> Canli Onizleme
+                </h3>
+
+                <!-- Onizleme Karti -->
+                <div style="background:var(--bg-dark);border:1px solid var(--border);
+                            border-radius:var(--radius-md);padding:1.25rem;text-align:center;">
+
+                    <!-- Durum Badge -->
+                    <div id="prev-status-wrap" style="margin-bottom:.85rem;">
+                        <span id="prev-status-live" class="tc-badge badge-live" style="display:none;">
+                            <span class="live-dot"></span> Canli
+                        </span>
+                        <span id="prev-status-finished" class="tc-badge badge-finished" style="display:none;">Bitti</span>
+                        <span id="prev-status-upcoming" class="tc-badge badge-upcoming">Yaklasan</span>
+                    </div>
+
+                    <!-- Macup Satiri: Ev Sahibi - Skor - Deplasman -->
+                    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;">
+
+                        <!-- Ev Sahibi -->
+                        <div style="text-align:center;flex:1;">
+                            <div style="width:52px;height:52px;margin:0 auto .5rem;border-radius:50%;
+                                        background:rgba(255,255,255,.04);border:1px solid var(--border);
+                                        display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                                <img id="prev-home-logo" src="" alt="" style="width:40px;height:40px;object-fit:contain;display:none;">
+                                <i id="prev-home-logo-ph" class="bi bi-shield" style="font-size:1.6rem;color:var(--text-muted);"></i>
+                            </div>
+                            <div id="prev-home-name"
+                                 style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+                                        max-width:90px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                Ev Sahibi
+                            </div>
+                        </div>
+
+                        <!-- Skor -->
+                        <div style="text-align:center;">
+                            <div style="font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:700;
+                                        letter-spacing:.05em;line-height:1;">
+                                <span id="prev-home-score">0</span>
+                                <span style="color:var(--text-muted);margin:0 .2rem;">-</span>
+                                <span id="prev-away-score">0</span>
+                            </div>
+                            <div id="prev-minute" style="font-size:.75rem;color:var(--red);margin-top:.2rem;display:none;">
+                                <span id="prev-minute-val">0</span>'
+                            </div>
+                        </div>
+
+                        <!-- Deplasman -->
+                        <div style="text-align:center;flex:1;">
+                            <div style="width:52px;height:52px;margin:0 auto .5rem;border-radius:50%;
+                                        background:rgba(255,255,255,.04);border:1px solid var(--border);
+                                        display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                                <img id="prev-away-logo" src="" alt="" style="width:40px;height:40px;object-fit:contain;display:none;">
+                                <i id="prev-away-logo-ph" class="bi bi-shield" style="font-size:1.6rem;color:var(--text-muted);"></i>
+                            </div>
+                            <div id="prev-away-name"
+                                 style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+                                        max-width:90px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                Deplasman
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Meta -->
+                    <div style="display:flex;flex-direction:column;gap:.35rem;text-align:left;
+                                border-top:1px solid var(--border);padding-top:.85rem;margin-top:.9rem;">
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;">
+                            <i class="bi bi-building" style="color:var(--text-muted);width:14px;text-align:center;"></i>
+                            <span id="prev-stadium" style="color:var(--text-muted);">Stadyum</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;">
+                            <i class="bi bi-flag" style="color:var(--text-muted);width:14px;text-align:center;"></i>
+                            <span id="prev-week" style="color:var(--text-muted);">-. Hafta</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.55rem;font-size:.82rem;">
+                            <i class="bi bi-star" style="color:var(--text-muted);width:14px;text-align:center;" id="prev-featured-icon"></i>
+                            <span id="prev-featured" style="color:var(--text-muted);">Normal Mac</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function setStatus(val) {
+            document.getElementById('statusInput').value = val;
+            ['LIVE', 'FINISHED', 'UPCOMING'].forEach(function (s) {
+                var btn = document.getElementById('btn-' + s);
+                if (!btn) return;
+                btn.classList.remove('tc-btn--primary', 'tc-btn--ghost');
+                btn.classList.add(s === val ? 'tc-btn--primary' : 'tc-btn--ghost');
+            });
+            document.getElementById('minuteGroup').style.display = val === 'LIVE' ? '' : 'none';
+            updateStatusBadge(val);
+        }
+
+        function updateStatusBadge(val) {
+            document.getElementById('prev-status-live').style.display      = val === 'LIVE'     ? '' : 'none';
+            document.getElementById('prev-status-finished').style.display  = val === 'FINISHED' ? '' : 'none';
+            document.getElementById('prev-status-upcoming').style.display  = val === 'UPCOMING' ? '' : 'none';
+            var minuteDiv = document.getElementById('prev-minute');
+            if (minuteDiv) minuteDiv.style.display = val === 'LIVE' ? '' : 'none';
+        }
+
+        function updateTeamLogo(imgId, phId, url) {
+            var img = document.getElementById(imgId);
+            var ph  = document.getElementById(phId);
+            if (url) {
+                img.src = url;
+                img.style.display = 'block';
+                if (ph) ph.style.display = 'none';
+            } else {
+                img.style.display = 'none';
+                if (ph) ph.style.display = '';
+            }
+        }
+
+        function updatePreview() {
+            var homeSelect = document.getElementById('homeTeamId');
+            var awaySelect = document.getElementById('awayTeamId');
+            var homeScore  = document.getElementById('homeScore') ? document.getElementById('homeScore').value : '0';
+            var awayScore  = document.getElementById('awayScore') ? document.getElementById('awayScore').value : '0';
+            var week       = document.getElementById('week')      ? document.getElementById('week').value      : '';
+            var stadium    = document.getElementById('stadium')   ? document.getElementById('stadium').value   : '';
+            var minute     = document.getElementById('minute')    ? document.getElementById('minute').value    : '0';
+            var featured   = document.getElementById('featuredToggle') ? document.getElementById('featuredToggle').checked : false;
+            var status     = document.getElementById('statusInput') ? document.getElementById('statusInput').value : 'UPCOMING';
+
+            var homeOpt  = homeSelect && homeSelect.selectedIndex > 0 ? homeSelect.options[homeSelect.selectedIndex] : null;
+            var awayOpt  = awaySelect && awaySelect.selectedIndex > 0 ? awaySelect.options[awaySelect.selectedIndex] : null;
+            var homeName = homeOpt ? homeOpt.text : 'Ev Sahibi';
+            var awayName = awayOpt ? awayOpt.text : 'Deplasman';
+            var homeLogo = homeOpt ? (homeOpt.dataset.logo || '') : '';
+            var awayLogo = awayOpt ? (awayOpt.dataset.logo || '') : '';
+
+            document.getElementById('prev-home-name').textContent = homeName;
+            document.getElementById('prev-away-name').textContent = awayName;
+            document.getElementById('prev-home-score').textContent = homeScore || '0';
+            document.getElementById('prev-away-score').textContent = awayScore || '0';
+            document.getElementById('prev-stadium').textContent = stadium || 'Stadyum';
+            document.getElementById('prev-week').textContent = week ? (week + '. Hafta') : '-. Hafta';
+            document.getElementById('prev-featured').textContent = featured ? 'One Cikan Mac' : 'Normal Mac';
+            document.getElementById('prev-featured-icon').style.color = featured ? 'var(--gold)' : 'var(--text-muted)';
+
+            var minuteVal = document.getElementById('prev-minute-val');
+            if (minuteVal) minuteVal.textContent = minute || '0';
+
+            updateTeamLogo('prev-home-logo', 'prev-home-logo-ph', homeLogo);
+            updateTeamLogo('prev-away-logo', 'prev-away-logo-ph', awayLogo);
+            updateStatusBadge(status);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updatePreview();
+        });
+    </script>
+
+</div>
+</body>
+</html>

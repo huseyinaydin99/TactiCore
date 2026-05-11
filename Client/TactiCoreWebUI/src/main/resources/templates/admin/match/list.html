@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}"
+      lang="tr">
+<head></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Flash Mesajlar -->
+    <div th:if="${successMessage}" class="admin-alert admin-alert--success">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="admin-alert admin-alert--error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Baslik + Ekle Butonu -->
+    <div class="section-header" style="margin-bottom:1.25rem;">
+        <div>
+            <h2 class="section-title">Mac Yonetimi</h2>
+            <p style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;"
+               th:text="|Toplam ${#lists.size(matches)} mac|">0 mac</p>
+        </div>
+        <a th:href="@{/admin/matches/add}" class="tc-btn tc-btn--primary">
+            <i class="bi bi-plus-circle"></i> Yeni Mac Ekle
+        </a>
+    </div>
+
+    <!-- Filtre Butonlari -->
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <button type="button" id="filter-ALL"
+                class="tc-btn tc-btn--primary"
+                onclick="setFilter('ALL')"
+                style="font-size:.82rem;padding:.35rem .8rem;">
+            <i class="bi bi-list-ul"></i> Tum Maclar
+            <span id="count-ALL" class="tc-badge"
+                  style="background:rgba(255,255,255,.12);color:inherit;margin-left:.3rem;padding:.1rem .4rem;font-size:.72rem;">0</span>
+        </button>
+        <button type="button" id="filter-LIVE"
+                class="tc-btn tc-btn--ghost"
+                onclick="setFilter('LIVE')"
+                style="font-size:.82rem;padding:.35rem .8rem;">
+            <i class="bi bi-broadcast"></i> Canli
+            <span id="count-LIVE" class="tc-badge"
+                  style="background:rgba(255,23,68,.15);color:var(--red);border-color:rgba(255,23,68,.25);margin-left:.3rem;padding:.1rem .4rem;font-size:.72rem;">0</span>
+        </button>
+        <button type="button" id="filter-FINISHED"
+                class="tc-btn tc-btn--ghost"
+                onclick="setFilter('FINISHED')"
+                style="font-size:.82rem;padding:.35rem .8rem;">
+            <i class="bi bi-check-circle"></i> Biten
+            <span id="count-FINISHED" class="tc-badge"
+                  style="background:rgba(0,200,83,.1);color:var(--green);border-color:rgba(0,200,83,.2);margin-left:.3rem;padding:.1rem .4rem;font-size:.72rem;">0</span>
+        </button>
+        <button type="button" id="filter-UPCOMING"
+                class="tc-btn tc-btn--ghost"
+                onclick="setFilter('UPCOMING')"
+                style="font-size:.82rem;padding:.35rem .8rem;">
+            <i class="bi bi-clock"></i> Yaklasan
+            <span id="count-UPCOMING" class="tc-badge"
+                  style="background:rgba(41,121,255,.12);color:var(--blue);border-color:rgba(41,121,255,.25);margin-left:.3rem;padding:.1rem .4rem;font-size:.72rem;">0</span>
+        </button>
+    </div>
+
+    <!-- Tablo -->
+    <div class="tc-card" style="padding:0;overflow:hidden;">
+
+        <div th:if="${#lists.isEmpty(matches)}"
+             style="text-align:center;padding:3.5rem 1rem;color:var(--text-muted);">
+            <i class="bi bi-trophy" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:var(--border);"></i>
+            <p style="margin-bottom:1rem;">Henuz mac eklenmemis.</p>
+            <a th:href="@{/admin/matches/add}" class="tc-btn tc-btn--primary" style="display:inline-flex;">
+                <i class="bi bi-plus-circle"></i> Ilk Maci Ekle
+            </a>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(matches)}" class="standings-table" id="matchesTable">
+            <thead>
+                <tr>
+                    <th style="width:40px;text-align:center;">#</th>
+                    <th>Ev Sahibi</th>
+                    <th style="text-align:center;width:90px;">Skor</th>
+                    <th>Deplasman</th>
+                    <th style="text-align:center;width:70px;">Hafta</th>
+                    <th style="width:130px;">Tarih / Saat</th>
+                    <th style="text-align:center;width:100px;">Durum</th>
+                    <th style="text-align:right;padding-right:1.25rem;">Islemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="match, iter : ${matches}"
+                    class="match-row"
+                    th:attr="data-status=${match.status.name()}">
+
+                    <!-- # -->
+                    <td style="text-align:center;color:var(--text-muted);font-size:.82rem;" th:text="${iter.count}">1</td>
+
+                    <!-- Ev Sahibi -->
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.55rem;">
+                            <div style="width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                                <img th:if="${match.homeTeamLogoUrl != null and !#strings.isEmpty(match.homeTeamLogoUrl)}"
+                                     th:src="${match.homeTeamLogoUrl}"
+                                     style="width:24px;height:24px;object-fit:contain;"
+                                     th:alt="${match.homeTeamName}">
+                                <i th:unless="${match.homeTeamLogoUrl != null and !#strings.isEmpty(match.homeTeamLogoUrl)}"
+                                   class="bi bi-shield" style="font-size:1.1rem;color:var(--text-muted);"></i>
+                            </div>
+                            <span style="font-weight:600;font-size:.9rem;" th:text="${match.homeTeamName}">Ev Sahibi</span>
+                        </div>
+                    </td>
+
+                    <!-- Skor -->
+                    <td style="text-align:center;">
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.03em;">
+                            <span th:text="${match.homeScore}">0</span>
+                            <span style="color:var(--text-muted);margin:0 .2rem;">-</span>
+                            <span th:text="${match.awayScore}">0</span>
+                        </span>
+                    </td>
+
+                    <!-- Deplasman -->
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.55rem;">
+                            <div style="width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                                <img th:if="${match.awayTeamLogoUrl != null and !#strings.isEmpty(match.awayTeamLogoUrl)}"
+                                     th:src="${match.awayTeamLogoUrl}"
+                                     style="width:24px;height:24px;object-fit:contain;"
+                                     th:alt="${match.awayTeamName}">
+                                <i th:unless="${match.awayTeamLogoUrl != null and !#strings.isEmpty(match.awayTeamLogoUrl)}"
+                                   class="bi bi-shield" style="font-size:1.1rem;color:var(--text-muted);"></i>
+                            </div>
+                            <span style="font-weight:600;font-size:.9rem;" th:text="${match.awayTeamName}">Deplasman</span>
+                        </div>
+                    </td>
+
+                    <!-- Hafta -->
+                    <td style="text-align:center;font-size:.88rem;color:var(--text-muted);" th:text="${match.week}">1</td>
+
+                    <!-- Tarih / Saat -->
+                    <td style="font-size:.82rem;">
+                        <div th:if="${match.matchDate != null}">
+                            <div th:text="${#temporals.format(match.matchDate, 'dd.MM.yyyy')}">01.01.2024</div>
+                            <div style="color:var(--text-muted);" th:text="${#temporals.format(match.matchDate, 'HH:mm')}">20:00</div>
+                        </div>
+                        <span th:unless="${match.matchDate != null}" style="color:var(--text-muted);">-</span>
+                    </td>
+
+                    <!-- Durum -->
+                    <td style="text-align:center;">
+                        <span th:if="${match.status.name() == 'LIVE'}" class="tc-badge badge-live">
+                            <span class="live-dot"></span> Canli
+                        </span>
+                        <span th:if="${match.status.name() == 'FINISHED'}" class="tc-badge badge-finished">Bitti</span>
+                        <span th:if="${match.status.name() == 'UPCOMING'}" class="tc-badge badge-upcoming">Yaklasan</span>
+                    </td>
+
+                    <!-- Islemler -->
+                    <td style="text-align:right;padding-right:1rem;">
+                        <a th:href="@{/admin/matches/edit/{id}(id=${match.id})}"
+                           class="tc-btn tc-btn--ghost"
+                           style="font-size:.8rem;padding:.3rem .65rem;margin-right:.3rem;">
+                            <i class="bi bi-pencil"></i> Duzenle
+                        </a>
+                        <form th:action="@{/admin/matches/delete/{id}(id=${match.id})}"
+                              method="post" style="display:inline;">
+                            <button type="submit"
+                                    class="tc-btn tc-btn--ghost"
+                                    style="font-size:.8rem;padding:.3rem .65rem;color:var(--red);border-color:rgba(255,23,68,.25);"
+                                    onclick="return confirm('Bu maci silmek istediginize emin misiniz?')">
+                                <i class="bi bi-trash"></i> Sil
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sayfalama -->
+    <div id="paginationBar" style="margin-top:1rem;"></div>
+
+    <script>
+        (function () {
+            var PER_PAGE = 10;
+            var allRows  = Array.from(document.querySelectorAll('#matchesTable tbody tr.match-row'));
+            var curFilter = 'ALL';
+            var curPage   = 1;
+
+            // Sayaclari hesapla
+            var counts = { ALL: 0, LIVE: 0, FINISHED: 0, UPCOMING: 0 };
+            allRows.forEach(function (r) {
+                counts.ALL++;
+                var s = r.dataset.status;
+                if (counts[s] !== undefined) counts[s]++;
+            });
+            ['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].forEach(function (k) {
+                var el = document.getElementById('count-' + k);
+                if (el) el.textContent = counts[k];
+            });
+
+            function visibleRows() {
+                return allRows.filter(function (r) {
+                    return curFilter === 'ALL' || r.dataset.status === curFilter;
+                });
+            }
+
+            function show(page) {
+                curPage = page;
+                var rows = visibleRows();
+                var total = rows.length;
+                var pages = Math.ceil(total / PER_PAGE) || 1;
+                if (curPage > pages) curPage = 1;
+
+                allRows.forEach(function (r) { r.style.display = 'none'; });
+                rows.forEach(function (r, i) {
+                    r.style.display = (i >= (curPage - 1) * PER_PAGE && i < curPage * PER_PAGE) ? '' : 'none';
+                });
+
+                renderPagination(total, pages);
+            }
+
+            function renderPagination(total, pages) {
+                if (total <= PER_PAGE) {
+                    document.getElementById('paginationBar').innerHTML = '';
+                    return;
+                }
+                function btn(label, page, active, disabled) {
+                    return '<button class="tc-btn ' + (active ? 'tc-btn--primary' : 'tc-btn--ghost') + '"' +
+                        ' style="font-size:.82rem;padding:.3rem .65rem;"' +
+                        (disabled ? ' disabled' : '') +
+                        ' onclick="window._tcPage(' + page + ')">' + label + '</button>';
+                }
+                var html = '<div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">';
+                html += btn('<i class="bi bi-chevron-left"></i>', curPage - 1, false, curPage === 1);
+                for (var i = 1; i <= pages; i++) html += btn(i, i, i === curPage, false);
+                html += btn('<i class="bi bi-chevron-right"></i>', curPage + 1, false, curPage === pages);
+                var start = (curPage - 1) * PER_PAGE + 1;
+                var end   = Math.min(curPage * PER_PAGE, total);
+                html += '<span style="font-size:.8rem;color:var(--text-muted);margin-left:.5rem;">' + start + '-' + end + ' / ' + total + '</span>';
+                html += '</div>';
+                document.getElementById('paginationBar').innerHTML = html;
+            }
+
+            window._tcPage = function (p) {
+                var rows  = visibleRows();
+                var pages = Math.ceil(rows.length / PER_PAGE) || 1;
+                if (p >= 1 && p <= pages) show(p);
+            };
+
+            window.setFilter = function (status) {
+                curFilter = status;
+                ['ALL', 'LIVE', 'FINISHED', 'UPCOMING'].forEach(function (k) {
+                    var btn = document.getElementById('filter-' + k);
+                    if (!btn) return;
+                    btn.classList.remove('tc-btn--primary', 'tc-btn--ghost');
+                    btn.classList.add(k === status ? 'tc-btn--primary' : 'tc-btn--ghost');
+                });
+                show(1);
+            };
+
+            show(1);
+        })();
+    </script>
+
+</div>
+</body>
+</html>
